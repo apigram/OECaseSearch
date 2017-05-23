@@ -4,6 +4,6 @@
 /* @var $form CActiveForm */
 ?>
 
-<div class="parameter row">
-      <?php $model->renderParameter(); ?>
+<div id="<?php echo $id;?>" class="parameter">
+    <?php $model->renderParameter($id); ?>
 </div><!-- form -->

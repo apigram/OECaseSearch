@@ -13,14 +13,14 @@ class OECaseSearchModule extends CWebModule
 
     public function init()
     {
-        // Initialise the search provider.
-        $this->searchProvider = $this->searchClass;
-
         // import the module-level models and components
         $this->setImport(array(
             'OECaseSearch.models.*',
             'OECaseSearch.components.*',
         ));
+
+        // Initialise the search provider.
+        $this->searchProvider = new $this->searchClass;
 
         $path = Yii::app()->assetManager->publish(Yii::getPathOfAlias('application.modules.OECaseSearch.assets'));
         Yii::app()->clientScript->registerScriptFile($path . '/js/QueryBuilder.js');

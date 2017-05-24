@@ -14,30 +14,28 @@ class DBProvider extends SearchProvider
      */
     protected function executeSearch($criteria)
     {
-        // Construct the SQL search string using each parameter as a separate dataset merged using INTERSECTs.
-        foreach ($criteria as $param)
+        $lastID = -1;
+        $queryStr = null;
+        // Construct the SQL search string using each parameter as a separate dataset merged using JOINs.
+        foreach ($criteria as $id => $param)
         {
-            if (!empty($queryStr))
-            {
-                $queryStr .= '\nINTERSECT\n';
-            }
             if (isset($queryStr))
             {
-                $queryStr .= $param->query($this);
+                $queryStr .= $param->join($lastID, array('id' => 'id'), $this);
             }
             else
             {
-                $queryStr = $param->query($this);
+                $from = $param->query($this);
+                $alias = $param->alias();
+                $queryStr = "SELECT $alias.id FROM ($from) $alias";
             }
+            $lastID = $id;
         }
 
         $count = Yii::app()->db->createCommand($queryStr)->query()->rowCount;
 
         $dataProvider = new CSqlDataProvider($queryStr, array(
             'totalItemCount' => $count,
-            'pagination' => array(
-                'pageSize' => 10,
-            )
         ));
         return $dataProvider->getData();
     }

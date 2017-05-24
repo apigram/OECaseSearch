@@ -7,34 +7,34 @@ $this->breadcrumbs = array(
 ?>
 <h1>Case Search</h1>
 
-<?php $form = $this->beginWidget('CActiveForm', array(
-    'action' => Yii::app()->createUrl($this->route),
-    'method' => 'post',
-    'id' => 'case-search-form',
-));?>
+<div class="form">
+  <?php $form = $this->beginWidget('CActiveForm', array(
+      'id' => 'search-form'
+      )); ?>
+  <?php echo $form->errorSummary($params); ?>
 
-<?php echo $form->errorSummary($params); ?>
-<div id="param-list">
-  <?php if (isset($params)):
-      foreach ($params as $id => $param):
-        $this->renderPartial('parameter_form', array(
-            'model' => $params[$id],
-            'id' => $id
-        ));
-    endforeach;
-  endif; ?>
-</div>
-<br/>
+  <div id="param-list">
+    <?php if (isset($params)):
+        foreach ($params as $id => $param):
+          $this->renderPartial('parameter_form', array(
+              'model' => $param,
+              'id' => $id
+          ));
+      endforeach;
+    endif; ?>
+  </div>
+  <br/>
 
-<div class="new-param">
-  <?php echo CHtml::dropDownList('Add Parameter: ', 'Select One...', $paramList, array('id' => 'param')); ?>
-  <?php echo CHtml::button('Add Parameter', array('id' => 'add-param')) ?>
-</div>
-<div class="search-actions">
-  <?php echo CHtml::submitButton('Search');?>
-</div>
+  <div class="new-param">
+    <?php echo CHtml::dropDownList('Add Parameter: ', 'Select One...', $paramList, array('id' => 'param')); ?>
+    <?php echo CHtml::button('Add Parameter', array('id' => 'add-param', 'class' => 'button secondary small')) ?>
+  </div>
+  <div class="search-actions">
+    <?php echo CHtml::submitButton('Search');?>
+  </div>
 
-<?php $this->endWidget();?>
+  <?php $this->endWidget();?>
+</div>
 
 <?php if (isset($patients))
 {
@@ -50,13 +50,12 @@ $this->breadcrumbs = array(
 <?php
 Yii::app()->clientScript->registerScript('addParam', "
 $('#add-param').click(function() {
-  var id = $('.parameter').last().attr('id') ? $('.parameter').last().attr('id') : 0;
+  var id = $('.parameter').last().attr('id') ? ($('.parameter').last().attr('id')) : -1;
   $.ajax({
-    url: '". Yii::app()->controller->createUrl('caseSearch/addParameter') . "?param=' + $('#param').val() + '&id=' + id,
+    url: '". Yii::app()->controller->createUrl('caseSearch/addParameter') . "?param=' + $('#param').val() + '&id=' + ++id,
     type: 'GET',
     success: function(response) {
       $('#param-list').append(response);
-      id++;
   }
 });
 });");

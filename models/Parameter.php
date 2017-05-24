@@ -18,10 +18,7 @@ abstract class Parameter extends CFormModel
 
     public function attributeNames()
     {
-        return array(
-            'Name' => 'name',
-            'Operation' => 'operation',
-        );
+        return array('name','operation');
     }
 
     /**
@@ -47,4 +44,17 @@ abstract class Parameter extends CFormModel
      * @return mixed The constructed query string.
      */
     abstract public function query($searchProvider);
+
+    /**
+     * @param $joinAlias The alias of the table being joined to.
+     * @param $criteria An array of join conditions. The ID for each element is the column name from the aliased table.
+     * @param $searchProvider The search provider. This is used for an internal query invocation for subqueries.
+     * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
+     */
+    abstract public function join($joinAlias, $criteria, $searchProvider);
+
+    /**
+     * @return string The alias of the table in the SQL query.
+     */
+    abstract public function alias();
 }

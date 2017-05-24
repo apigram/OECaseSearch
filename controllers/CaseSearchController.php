@@ -6,8 +6,7 @@ class CaseSearchController extends BaseModuleController
     {
         return array(
             'accessControl',
-            //'ajaxOnly + addParameter',
-            'postOnly + delete',
+            'ajaxOnly + addParameter',
         );
     }
 
@@ -27,12 +26,12 @@ class CaseSearchController extends BaseModuleController
         $valid = true;
         $parameters = array();
         $patients = array();
-        foreach ($this->getModule()->parameters as $parameter) {
+        foreach ($this->module->parameters as $parameter) {
             $paramName = $parameter . 'Parameter';
             if (isset($_POST[$paramName])) {
                 foreach ($_POST[$paramName] as $id => $param) {
                     $newParam = new $paramName;
-                    $newParam->attributes = $param;
+                    $newParam->attributes = $_POST[$paramName][$id];
                     if (!$newParam->validate()) {
                         $valid = false;
                     }
@@ -41,15 +40,16 @@ class CaseSearchController extends BaseModuleController
             }
         }
         if (!empty($parameters) and $valid) {
-            $dataProvider = $this->module->getSearchProvider();
-            $results = $dataProvider->search($parameters);
+            $results = $this->module->getSearchProvider()->search($parameters);
             // deconstruct the results list into a single array of primary keys.
             $ids = array();
-            foreach ($results as $result)
+            foreach ($results as $result) {
                 $ids[] = $result['id'];
+            }
             $patients = Patient::model()->findAllByPk($ids);
         }
         $paramList = $this->module->getParamList();
+
         $this->render('index', array(
             'paramList' => $paramList,
             'params' => $parameters,
@@ -62,6 +62,7 @@ class CaseSearchController extends BaseModuleController
         $id = $_GET['id'];
         $param = $_GET['param'];
         $parameter = new $param;
+        $parameter->id = $id;
 
         $this->renderPartial('parameter_form', array(
             'model' => $parameter,

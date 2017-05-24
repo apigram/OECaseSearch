@@ -11,6 +11,7 @@ class PatientAgeParameter extends Parameter
     public $textValue;
     public $minValue;
     public $maxValue;
+    public $id;
 
     public function __construct($scenario = '')
     {
@@ -21,7 +22,7 @@ class PatientAgeParameter extends Parameter
     public function rules()
     {
         $rules = parent::rules();
-        $rules[] = array('textValue, minValue, maxValue', 'safe');
+        $rules[] = array('textValue, minValue, maxValue, id', 'safe');
         $rules[] = array('textValue, minValue, maxValue', 'values');
         return $rules;
     }
@@ -32,6 +33,7 @@ class PatientAgeParameter extends Parameter
         $attrs[] = 'textValue';
         $attrs[] = 'minValue';
         $attrs[] = 'maxValue';
+        $attrs[] = 'id';
         return $attrs;
     }
 
@@ -40,7 +42,8 @@ class PatientAgeParameter extends Parameter
         return array(
             'textValue' => 'Value',
             'minValue' => 'Minimum Value',
-            'maxValue' => 'Maximum Value'
+            'maxValue' => 'Maximum Value',
+            'id' => 'ID'
         );
     }
 
@@ -105,6 +108,7 @@ class PatientAgeParameter extends Parameter
             echo CHtml::activeTextField($this, "[$id]textValue");
             echo '</div>';
         }
+        echo CHtml::activeHiddenField($this, "[$id]id");
         echo CHtml::link('Remove', '#', array('onclick'=> 'removeParam(this)', 'class' => 'remove-link'));
     }
 
@@ -112,16 +116,13 @@ class PatientAgeParameter extends Parameter
     {
         if ($searchProvider->isSql())
         {
+            $alias = 'p_a_' . $this->id;
             if ($this->operation === 'BETWEEN') {
-                return ('SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE()))'
-                    . ' ' . $this->operation
-                    . ' ' . $this->minValue . ' AND ' . $this->maxValue);
+                return "SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE())) $this->operation $this->minValue AND $this->maxValue";
             }
             else
             {
-                return ('SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE()))'
-                    . ' ' . $this->operation
-                    . ' ' . $this->textValue);
+                return "SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE())) $this->operation $this->textValue";
             }
 
         }
@@ -129,5 +130,29 @@ class PatientAgeParameter extends Parameter
         {
             return null; // Not yet implemented.
         }
+    }
+
+    public function alias()
+    {
+        return "p_a_$this->id";
+    }
+
+    public function join($joinAlias, $criteria, $searchProvider)
+    {
+        $subQuery = $this->query($searchProvider);
+        $query = '';
+        foreach ($criteria as $key => $column)
+        {
+            // if the string isn't empty, the condition is not the first so prepend it with an AND.
+            if (!empty($query))
+            {
+                $query .= ' AND ';
+            }
+            $query .= "p_a_$joinAlias.$key = p_a_$this->id.$column";
+        }
+
+        $query = " JOIN ($subQuery) p_a_$this->id ON " . $query;
+
+        return $query;
     }
 }

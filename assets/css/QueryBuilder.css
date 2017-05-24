@@ -1,0 +1,73 @@
+.parameter {
+    display: block;
+    margin-right: 50%;
+    border: 2px solid black;
+    border-radius: 5px;
+    background-color: white;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+}
+
+#param-list {
+    margin-left: 20px;
+}
+
+#param {
+    max-width: 10%;
+}
+
+.new-param {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.new-param input {
+    margin-right: 10px;
+}
+
+.remove-link {
+    margin-left: 10px;
+}
+
+.search-actions {
+    margin-left: 20px;
+}
+
+.parameter label {
+    display: inline;
+}
+
+.parameter select {
+    display: inline;
+    max-width: 10%;
+    margin-left: 1%;
+}
+
+.parameter div {
+    display: inline-block;
+    margin-left: 1%;
+}
+
+.parameter .dual-value {
+    display: none;
+    margin-left: 1%;
+}
+
+.result {
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.result * {
+    margin-left: 10px;
+}
+
+.detail {
+    display: none;
+    margin-right: 50%;
+}

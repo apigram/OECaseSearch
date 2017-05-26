@@ -6,15 +6,15 @@
  * Date: 22/05/2017
  * Time: 11:11 AM
  */
-abstract class Parameter extends CFormModel
+abstract class CaseSearchParameter extends CFormModel
 {
     /**
-     * @var Parameter name
+     * @var CaseSearchParameter name
      */
     public $name;
 
     /**
-     * @var Parameter operator.
+     * @var CaseSearchParameter operator.
      */
     public $operation;
 

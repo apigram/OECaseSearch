@@ -1,6 +1,6 @@
 <?php
 /* @var $this ParameterController */
-/* @var $model Parameter */
+/* @var $model CaseSearchParameter */
 /* @var $form CActiveForm */
 ?>
 

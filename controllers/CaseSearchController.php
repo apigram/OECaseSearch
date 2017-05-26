@@ -7,6 +7,7 @@ class CaseSearchController extends BaseModuleController
         return array(
             'accessControl',
             'ajaxOnly + addParameter',
+            'ajaxOnly + clear',
         );
     }
 
@@ -15,17 +16,25 @@ class CaseSearchController extends BaseModuleController
         return array(
             array(
                 'allow',
-                'actions' => array('index', 'addParameter'),
+                'actions' => array('index', 'addParameter', 'clear'),
                 'users' => array('admin'),
             ),
         );
     }
 
+    /**
+     * Primary case search action.
+     */
     public function actionIndex()
     {
         $valid = true;
         $parameters = array();
-        $patients = array();
+        $ids = array();
+        if (isset($_SESSION['last_search'])) {
+            $ids = $_SESSION['last_search'];
+        }
+
+        $criteria = new CDbCriteria();
         foreach ($this->module->parameters as $parameter) {
             $paramName = $parameter . 'Parameter';
             if (isset($_POST[$paramName])) {
@@ -40,23 +49,43 @@ class CaseSearchController extends BaseModuleController
             }
         }
         if (!empty($parameters) and $valid) {
-            $results = $this->module->getSearchProvider()->search($parameters);
-            // deconstruct the results list into a single array of primary keys.
+            $this->actionClear();
+            $results = $this->module->getSearchProvider('mysql')->search($parameters);
+
             $ids = array();
+
+            // deconstruct the results list into a single array of primary keys.
             foreach ($results as $result) {
                 $ids[] = $result['id'];
             }
-            $patients = Patient::model()->findAllByPk($ids);
+
+            // Only copy to the $_SESSION array if it isn't already there - Shallow copy is done at the start if it is already set.
+            if (!isset($_SESSION['last_search']) or empty($_SESSION['last_search']))
+            {
+                $_SESSION['last_search'] = $ids;
+            }
         }
+        $criteria->compare('id', empty($ids) ? -1 : $ids);
+
+        $patientData = new CActiveDataProvider('Patient', array(
+            'criteria' => $criteria,
+            'totalItemCount' => count($ids),
+            'pagination' => array(
+                'pageSize' => 10
+            )
+        ));
         $paramList = $this->module->getParamList();
 
         $this->render('index', array(
             'paramList' => $paramList,
             'params' => $parameters,
-            'patients' => $patients
+            'patients' => $patientData,
         ));
     }
 
+    /**
+     * Add a parameter to the case search. This is executed through an AJAX request.
+     */
     public function actionAddParameter()
     {
         $id = $_GET['id'];
@@ -68,5 +97,13 @@ class CaseSearchController extends BaseModuleController
             'model' => $parameter,
             'id' => $id,
         ));
+    }
+
+    /**
+     * Clear the parameters and search results. This is executed through an AJAX request
+     */
+    public function actionClear()
+    {
+        unset($_SESSION['last_search']);
     }
 }

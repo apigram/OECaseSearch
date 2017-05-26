@@ -1,26 +1,44 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: andre
- * Date: 19/05/2017
- * Time: 5:11 PM
+ * Class SearchProvider
  */
 abstract class SearchProvider
 {
-    public function search($parameters)
+    private $providerID;
+
+    /**
+     * SearchProvider constructor.
+     * @param $id An identifier uniquely identifying the search provider.
+     */
+    public function __construct($id)
+    {
+        $this->providerID = $id;
+    }
+
+    /**
+     * Perform a search using the specified parameters.
+     * @param $parameters A list of Parameter objects representing a search parameter.
+     * @return mixed Search results. This will take whatever form is specified within the subclass' executeSearch implementation.
+     */
+    public final function search($parameters)
     {
         return $this->executeSearch($parameters);
     }
 
     /**
-     * @param $criteria A list of search parameters.
-     * @return mixed An array of search results.
+     * Get the search provider's unique ID.
+     * @return mixed The search provider's unique ID.
      */
-    abstract protected function executeSearch($criteria);
+    public final function getProviderID()
+    {
+        return $this->providerID;
+    }
 
     /**
-     * @return boolean True if the search provider uses SQL, or false if it doesn't use SQL.
+     * Search delegate function.
+     * @param $criteria A list of search parameters.
+     * @return mixed Search results.
      */
-    abstract public function isSql();
+    abstract protected function executeSearch($criteria);
 }

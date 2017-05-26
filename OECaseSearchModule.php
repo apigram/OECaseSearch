@@ -2,14 +2,20 @@
 
 /**
  * Class OECaseSearchModule
- * When adding this module to the application, parameter classes are specified as XXYY (Parameter is automatically appended).
+ * When adding this module to the application, parameter classes are specified as XXYY (Parameter is automatically appended eg. PatientAge becomes PatientAgeParameter).
  */
 class OECaseSearchModule extends CWebModule
 {
+    /**
+     * @var array A list of parameter classes that can be selected on the Case Search screen.
+     */
     public $parameters = array();
 
-    public $searchClass;
-    private $searchProvider;
+    /**
+     * @var array A List of search providers that can be used for searching. These are specified in the format ['providerID' => 'className'].
+     */
+    public $providers = array();
+    private $searchProviders = array();
 
     public function init()
     {
@@ -19,8 +25,11 @@ class OECaseSearchModule extends CWebModule
             'OECaseSearch.components.*',
         ));
 
-        // Initialise the search provider.
-        $this->searchProvider = new $this->searchClass;
+        // Initialise the search provider/s.
+        foreach ($this->providers as $providerID => $searchProvider)
+        {
+            $this->searchProviders[$providerID] = new $searchProvider($providerID);
+        }
 
         $path = Yii::app()->assetManager->publish(Yii::getPathOfAlias('application.modules.OECaseSearch.assets'));
         Yii::app()->clientScript->registerScriptFile($path . '/js/QueryBuilder.js');
@@ -28,6 +37,9 @@ class OECaseSearchModule extends CWebModule
         Yii::app()->clientScript->registerCssFile($path . '/css/QueryBuilder.css');
     }
 
+    /**
+     * @return array The list of parameter classes configured for the case search module.
+     */
     public function getParamList()
     {
         $keys = array();
@@ -42,11 +54,12 @@ class OECaseSearchModule extends CWebModule
     }
 
     /**
-     * @return SearchProvider The initialised search provider.
+     * @param $providerID The unique ID of the search provider you wish to use. This can be found in config/common.php for each included search provider.
+     * @return mixed
      */
-    public function getSearchProvider()
+    public function getSearchProvider($providerID)
     {
-        return $this->searchProvider;
+        return $this->searchProviders[$providerID];
     }
 
     public function beforeControllerAction($controller, $action)

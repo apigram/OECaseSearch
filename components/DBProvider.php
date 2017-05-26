@@ -15,7 +15,8 @@ class DBProvider extends SearchProvider
     protected function executeSearch($criteria)
     {
         $lastID = -1;
-        $queryStr = null;
+        $bindValues = array();
+
         // Construct the SQL search string using each parameter as a separate dataset merged using JOINs.
         foreach ($criteria as $id => $param)
         {
@@ -29,19 +30,13 @@ class DBProvider extends SearchProvider
                 $alias = $param->alias();
                 $queryStr = "SELECT $alias.id FROM ($from) $alias";
             }
+            $bindValues = array_merge($bindValues, $param->bindValues());
             $lastID = $id;
         }
 
-        $count = Yii::app()->db->createCommand($queryStr)->query()->rowCount;
+        $command = Yii::app()->db->createCommand($queryStr)->bindValues($bindValues);
+        $command->prepare();
 
-        $dataProvider = new CSqlDataProvider($queryStr, array(
-            'totalItemCount' => $count,
-        ));
-        return $dataProvider->getData();
-    }
-
-    public function isSql()
-    {
-        return true;
+        return $command->queryAll();
     }
 }

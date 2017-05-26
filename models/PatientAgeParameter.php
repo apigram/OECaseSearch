@@ -8,17 +8,40 @@
  */
 class PatientAgeParameter extends Parameter
 {
+    /**
+     * @var integer Represents a single value
+     */
     public $textValue;
+
+    /**
+     * @var integer Represents a minimum value.
+     */
     public $minValue;
+
+    /**
+     * @var integer Represents a maximum value.
+     */
     public $maxValue;
+
+    /**
+     * @var The unique ID of the parameter.
+     */
     public $id;
 
+    /**
+     * PatientAgeParameter constructor. This overrides the parent constructor so that the name can be immediately set.
+     * @param string $scenario
+     */
     public function __construct($scenario = '')
     {
         parent::__construct($scenario);
         $this->name = 'age';
     }
 
+    /**
+     * This has been overridden to allow additional rules surrounding the operator and value fields.
+     * @return array Complete array of validation rules.
+     */
     public function rules()
     {
         $rules = parent::rules();
@@ -27,6 +50,10 @@ class PatientAgeParameter extends Parameter
         return $rules;
     }
 
+    /**
+     * This has been overridden to add additional attributes.
+     * @return array Complete array of attribute names.
+     */
     public function attributeNames()
     {
         $attrs = parent::attributeNames();
@@ -37,6 +64,10 @@ class PatientAgeParameter extends Parameter
         return $attrs;
     }
 
+    /**
+     * Attribute labels for display purposes.
+     * @return array Attribute key/value pairs.
+     */
     public function attributeLabels()
     {
         return array(
@@ -70,11 +101,17 @@ class PatientAgeParameter extends Parameter
         }
     }
 
+    /**
+     * @return string "Patient age".
+     */
     public function getKey()
     {
         return 'Patient Age';
     }
 
+    /**
+     * @param The $id of the parameter for rendering purposes.
+     */
     public function renderParameter($id)
     {
         $ops = array(
@@ -112,17 +149,51 @@ class PatientAgeParameter extends Parameter
         echo CHtml::link('Remove', '#', array('onclick'=> 'removeParam(this)', 'class' => 'remove-link'));
     }
 
+    /**
+     * Generate the SQL query for patient age.
+     * @param The $searchProvider building the query.
+     * @return null|string The query string for use by the search provider, or null if not implemented for the specified search provider.
+     * @throws CHttpException
+     */
     public function query($searchProvider)
     {
-        if ($searchProvider->isSql())
+        if ($searchProvider->getProviderID()  === 'mysql')
         {
-            $alias = 'p_a_' . $this->id;
-            if ($this->operation === 'BETWEEN') {
-                return "SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE())) $this->operation $this->minValue AND $this->maxValue";
+            switch ($this->operation)
+            {
+                case 'BETWEEN':
+                    $op = 'BETWEEN';
+                    break;
+                case '>':
+                    $op = '>';
+                    break;
+                case '<':
+                    $op = '<';
+                    break;
+                case '>=':
+                    $op = '>=';
+                    break;
+                case '<=':
+                    $op = '<=';
+                    break;
+                case '=':
+                    $op = '=';
+                    break;
+                case '!=':
+                    $op = '!=';
+                    break;
+                default:
+                    throw new CHttpException(400, 'Invalid operator specified.');
+                    break;
+            }
+
+            $queryStr = 'SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE()))';
+            if ($op === 'BETWEEN') {
+                return "$queryStr $op :p_a_min_$this->id AND :p_a_max_$this->id";
             }
             else
             {
-                return "SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE())) $this->operation $this->textValue";
+                return "$queryStr $op :p_a_value_$this->id";
             }
 
         }
@@ -132,11 +203,44 @@ class PatientAgeParameter extends Parameter
         }
     }
 
+    /**
+     * @return array The list of bind values being used by the current parameter instance.
+     */
+    public function bindValues()
+    {
+        $bindValues = array();
+        if (!empty($this->minValue))
+        {
+            $bindValues["p_a_min_$this->id"] = $this->minValue;
+        }
+
+        if (!empty($this->maxValue))
+        {
+            $bindValues["p_a_max_$this->id"] = $this->maxValue;
+        }
+
+        if (!empty($this->textValue))
+        {
+            $bindValues["p_a_value_$this->id"] = $this->textValue;
+        }
+
+        return $bindValues;
+    }
+
+    /**
+     * @return string Alias of the patient age parameter. Form is "p_a_#id".
+     */
     public function alias()
     {
         return "p_a_$this->id";
     }
 
+    /**
+     * @param $joinAlias of the table.
+     * @param A $criteria used for JOINs.
+     * @param $searchProvider constructing the JOIN SQL statement.
+     * @return string The constructed SQL JOIN statement.
+     */
     public function join($joinAlias, $criteria, $searchProvider)
     {
         $subQuery = $this->query($searchProvider);

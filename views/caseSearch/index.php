@@ -45,7 +45,7 @@ $this->breadcrumbs = array(
         $this->widget('zii.widgets.CListView', array(
             'dataProvider' => $patients,
             'itemView' => 'search_results',
-            'emptyText' => 'No patients found.'
+            'emptyText' => '<div class="box generic">No patients found</div>'
         ));
       }
       ?>

@@ -2,6 +2,7 @@
 
 class CaseSearchController extends BaseModuleController
 {
+    public $layout = '//layouts/main';
     public function filters()
     {
         return array(

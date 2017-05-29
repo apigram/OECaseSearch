@@ -17,7 +17,7 @@ class CaseSearchController extends BaseModuleController
             array(
                 'allow',
                 'actions' => array('index', 'addParameter', 'clear'),
-                'users' => array('admin'),
+                'users' => array('@'),
             ),
         );
     }

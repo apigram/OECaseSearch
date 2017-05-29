@@ -19,6 +19,11 @@ abstract class CaseSearchParameter extends CFormModel
     public $operation;
 
     /**
+     * @var CaseSearchParameter ID.
+     */
+    public $id;
+
+    /**
      * Get the parameter identifier (usually the name).
      * @return string The human-readable name of the parameter (for display purposes).
      */
@@ -30,7 +35,7 @@ abstract class CaseSearchParameter extends CFormModel
      */
     public function attributeNames()
     {
-        return array('name','operation');
+        return array('name','operation', 'id');
     }
 
     /**
@@ -41,7 +46,7 @@ abstract class CaseSearchParameter extends CFormModel
     {
         return array(
             array('operation', 'required'),
-            array('operation', 'safe')
+            array('operation, id', 'safe')
         );
     }
 

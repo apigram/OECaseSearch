@@ -24,11 +24,6 @@ class PatientAgeParameter extends CaseSearchParameter
     public $maxValue;
 
     /**
-     * @var The unique ID of the parameter.
-     */
-    public $id;
-
-    /**
      * PatientAgeParameter constructor. This overrides the parent constructor so that the name can be immediately set.
      * @param string $scenario
      */
@@ -44,10 +39,10 @@ class PatientAgeParameter extends CaseSearchParameter
      */
     public function rules()
     {
-        $rules = parent::rules();
-        $rules[] = array('textValue, minValue, maxValue, id', 'safe');
-        $rules[] = array('textValue, minValue, maxValue', 'values');
-        return $rules;
+        return array_merge(parent::rules(), array(
+            array('textValue, minValue, maxValue', 'safe'),
+            array('textValue, minValue, maxValue', 'values'),
+        ));
     }
 
     /**
@@ -56,12 +51,11 @@ class PatientAgeParameter extends CaseSearchParameter
      */
     public function attributeNames()
     {
-        $attrs = parent::attributeNames();
-        $attrs[] = 'textValue';
-        $attrs[] = 'minValue';
-        $attrs[] = 'maxValue';
-        $attrs[] = 'id';
-        return $attrs;
+        return array_merge(parent::attributeNames(), array(
+            'textValue',
+            'minValue',
+            'maxValue',
+        ));
     }
 
     /**
@@ -146,7 +140,6 @@ class PatientAgeParameter extends CaseSearchParameter
             echo '</div>';
         }
         echo CHtml::activeHiddenField($this, "[$id]id");
-        echo CHtml::link('Remove', '#', array('onclick'=> 'removeParam(this)', 'class' => 'remove-link'));
     }
 
     /**
@@ -252,7 +245,7 @@ class PatientAgeParameter extends CaseSearchParameter
             {
                 $query .= ' AND ';
             }
-            $query .= "p_a_$joinAlias.$key = p_a_$this->id.$column";
+            $query .= "$joinAlias.$key = p_a_$this->id.$column";
         }
 
         $query = " JOIN ($subQuery) p_a_$this->id ON " . $query;

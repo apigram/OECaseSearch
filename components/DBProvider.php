@@ -22,7 +22,7 @@ class DBProvider extends SearchProvider
         {
             if (isset($queryStr))
             {
-                $queryStr .= $param->join($lastID, array('id' => 'id'), $this);
+                $queryStr .= $param->join($criteria[$lastID]->alias(), array('id' => 'id'), $this);
             }
             else
             {

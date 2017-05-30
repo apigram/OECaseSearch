@@ -19,7 +19,7 @@ class AutoCompleteController extends BaseModuleController
         return array(
             array(
                 'allow',
-                'actions' => array('commonDiagnoses'),
+                'actions' => array('commonDiagnoses', 'commonMedicines'),
                 'users' => array('@'),
             ),
         );
@@ -36,6 +36,29 @@ class AutoCompleteController extends BaseModuleController
         foreach ($disorders as $disorder)
         {
             $values[] = $disorder->term;
+        }
+
+        echo CJSON::encode($values);
+    }
+
+    /**
+     * Get the first 30 diagnosis matches for the given text. This is executed through an implicit AJAX request from the CJuiAutoComplete widget.
+     * @param $term The term supplied from the JUI Autocomplete widget.
+     */
+    public function actionCommonMedicines($term)
+    {
+        $medicines = Medication::model()->findAllBySql("
+SELECT m.*
+FROM medication m 
+LEFT JOIN drug d 
+  ON d.id = m.drug_id 
+LEFT JOIN medication_drug md
+  ON md.id = m.medication_drug_id
+WHERE LCASE(d.name) LIKE LCASE(:term) OR LCASE(md.name) LIKE LCASE(:term) ORDER BY d.name, md.name LIMIT 30", array('term' => "%$term%"));
+        $values = array();
+        foreach ($medicines as $medicine)
+        {
+            $values[] = $medicine->getDrugLabel();
         }
 
         echo CJSON::encode($values);

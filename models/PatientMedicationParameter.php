@@ -1,22 +1,22 @@
 <?php
-class PatientDiagnosisParameter extends CaseSearchParameter
+class PatientMedicationParameter extends CaseSearchParameter
 {
     public $textValue;
 
     /**
-    * PatientAgeParameter constructor. This overrides the parent constructor so that the name can be immediately set.
+    * CaseSearchParameter constructor. This overrides the parent constructor so that the name can be immediately set.
     * @param string $scenario
     */
     public function __construct($scenario = '')
     {
         parent::__construct($scenario);
-        $this->name = 'diagnosis';
+        $this->name = 'medication';
     }
 
     public function getKey()
     {
         // This is a human-readable value, so feel free to change this as required.
-        return 'Diagnosis';
+        return 'Medication';
     }
 
     /**
@@ -25,7 +25,10 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     */
     public function attributeNames()
     {
-        return array_merge(parent::attributeNames(), array('textValue'));
+        return array_merge(parent::attributeNames(), array(
+                'textValue',
+            )
+        );
     }
 
     /**
@@ -46,7 +49,8 @@ class PatientDiagnosisParameter extends CaseSearchParameter
         // Place screen-rendering code here.
         $ops = array(
             '=' => '=',
-            '!=' => '!='
+            '!=' => '!=',
+            'contains' => 'contains'
         );
 
         echo CHtml::label($this->getKey(), false);
@@ -57,7 +61,7 @@ class PatientDiagnosisParameter extends CaseSearchParameter
             'name' => 'diagnosis',
             'model' => $this,
             'attribute' => "[$id]textValue",
-            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonDiagnoses'),
+            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonMedicines'),
             'options' => array(
                 'minLength' => 2,
             ),
@@ -70,16 +74,17 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     }
 
     /**
-     * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
-     * @return mixed The constructed query string.
+    * Generate a SQL fragment representing the subquery of a FROM condition.
+    * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+    * @return mixed The constructed query string.
      * @throws CHttpException
-     */
+    */
     public function query($searchProvider)
     {
         // Construct your SQL query here.
         if ($searchProvider->getProviderID()  === 'mysql')
         {
+            $wildcard = ''; // This will only be set for 'contains' operations. Other operations will not use wildcards so they are left blank.
             switch ($this->operation)
             {
                 case '=':
@@ -90,19 +95,24 @@ class PatientDiagnosisParameter extends CaseSearchParameter
                     break;
                 case 'contains':
                     $op = 'LIKE';
+                    $wildcard = '%';
                     break;
                 default:
                     throw new CHttpException(400, 'Invalid operator specified.');
                     break;
             }
 
-            return "SELECT p.id 
+            return "
+SELECT p.id 
 FROM patient p 
-JOIN secondary_diagnosis sd 
-  ON sd.patient_id = p.id 
-JOIN disorder d 
-  ON d.id = sd.disorder_id 
-WHERE d.term $op :p_d_value_$this->id";
+JOIN medication m 
+  ON m.patient_id = p.id 
+LEFT JOIN drug d 
+  ON d.id = m.drug_id
+LEFT JOIN medication_drug md
+  ON md.id = m.medication_drug_id
+WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
+  OR md.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'";
         }
         else
         {
@@ -116,9 +126,9 @@ WHERE d.term $op :p_d_value_$this->id";
     */
     public function bindValues()
     {
-        // Construct your list of bind values here. Use the format ":bind" => "value".
+        // Construct your list of bind values here. Use the format "bind" => "value".
         return array(
-            "p_d_value_$this->id" => $this->textValue,
+            "p_m_value_$this->id" => $this->textValue,
         );
     }
 
@@ -141,10 +151,10 @@ WHERE d.term $op :p_d_value_$this->id";
             {
                 $query .= ' AND ';
             }
-            $query .= "$joinAlias.$key = p_d_$this->id.$column";
+            $query .= "$joinAlias.$key = p_m_$this->id.$column";
         }
 
-        $query = " JOIN ($subQuery) p_d_$this->id ON " . $query;
+        $query = " JOIN ($subQuery) p_m_$this->id ON " . $query;
 
         return $query;
     }
@@ -155,6 +165,6 @@ WHERE d.term $op :p_d_value_$this->id";
     */
     public function alias()
     {
-        return "p_d_$this->id";
+        return "p_m_$this->id";
     }
 }

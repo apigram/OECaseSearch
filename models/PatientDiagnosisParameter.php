@@ -45,14 +45,19 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     {
         // Place screen-rendering code here.
         $ops = array(
-            '=' => '=',
-            '!=' => '!='
+            '=' => 'Diagnosed with',
+            '!=' => 'Not diagnosed with'
         );
 
-        echo CHtml::label($this->getKey(), false);
+        echo '<div class="large-1 column">';
+        echo CHtml::label('Patient', false);
+        echo '</div>';
+        echo '<div class="large-3 column">';
         echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
+        echo CHtml::error($this, "[$id]operation");
+        echo '</div>';
 
-        echo '<div class="single-value"> ';
+        echo '<div class="single-value large-6 column"> ';
         $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
             'name' => 'diagnosis',
             'model' => $this,
@@ -64,9 +69,8 @@ class PatientDiagnosisParameter extends CaseSearchParameter
         ), true);
         Yii::app()->clientScript->render($html);
         echo $html;
+        echo CHtml::error($this, "[$id]textValue");
         echo '</div>';
-
-        echo CHtml::activeHiddenField($this, "[$id]id");
     }
 
     /**

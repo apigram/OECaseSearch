@@ -13,7 +13,11 @@ $this->breadcrumbs = array(
       <?php $form = $this->beginWidget('CActiveForm', array(
           'id' => 'search-form'
           )); ?>
-      <?php echo $form->errorSummary($params); ?>
+      <?php if (!empty($form->errorSummary($params))):?>
+        <div class="box admin">
+            <?php echo $form->errorSummary($params); ?>
+        </div>
+      <?php endif; ?>
 
       <div id="param-list">
         <?php if (isset($params)):
@@ -40,12 +44,12 @@ $this->breadcrumbs = array(
     </div>
 
     <div id="results">
-      <?php if (isset($patients))
-      {
+      <?php if (isset($patients)) {
         $this->widget('zii.widgets.CListView', array(
             'dataProvider' => $patients,
             'itemView' => 'search_results',
-            'emptyText' => '<div class="box generic">No patients found</div>'
+            'emptyText' => '<div class="box generic">No patients found</div>',
+            'summaryCssClass' => 'box generic',
         ));
       }
       ?>

@@ -1,7 +1,7 @@
 <?php
-class PatientMedicationParameter extends CaseSearchParameter
+class PreviousTrialParameter extends CaseSearchParameter
 {
-    public $textValue;
+    public $trial;
 
     /**
     * CaseSearchParameter constructor. This overrides the parent constructor so that the name can be immediately set.
@@ -10,13 +10,13 @@ class PatientMedicationParameter extends CaseSearchParameter
     public function __construct($scenario = '')
     {
         parent::__construct($scenario);
-        $this->name = 'medication';
+        $this->name = 'previous_trial';
     }
 
     public function getKey()
     {
         // This is a human-readable value, so feel free to change this as required.
-        return 'Medication';
+        return 'Previous Trial';
     }
 
     /**
@@ -26,7 +26,7 @@ class PatientMedicationParameter extends CaseSearchParameter
     public function attributeNames()
     {
         return array_merge(parent::attributeNames(), array(
-                'textValue',
+                'trial',
             )
         );
     }
@@ -38,8 +38,7 @@ class PatientMedicationParameter extends CaseSearchParameter
     public function rules()
     {
         return array_merge(parent::rules(), array(
-                array('textValue', 'required'),
-                array('textValue', 'safe')
+                array('trial', 'safe'),
             )
         );
     }
@@ -48,9 +47,15 @@ class PatientMedicationParameter extends CaseSearchParameter
     {
         // Place screen-rendering code here.
         $ops = array(
-            'LIKE' => 'Has taken ',
-            'UNLIKE' => 'Has not taken',
+            '=' => 'has been in trial',
+            '!=' => 'has never been in trial'
         );
+
+        $trialModels = Trial::model()->findAll();
+        $trials = array();
+        foreach ($trialModels as $trial) {
+            $trials[$trial->id] = "$trial->name - $trial->description";
+        }
 
         echo '<div class="large-1 column">';
         echo CHtml::label('Patient', false);
@@ -61,21 +66,8 @@ class PatientMedicationParameter extends CaseSearchParameter
         echo '</div>';
 
         echo '<div class="large-6 column"> ';
-        $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
-            'name' => 'medication',
-            'model' => $this,
-            'attribute' => "[$id]textValue",
-            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonMedicines'),
-            'options' => array(
-                'minLength' => 2,
-            ),
-        ), true);
-        Yii::app()->clientScript->render($html);
-        echo $html;
-        echo CHtml::error($this, "[$id]textValue");
+        echo CHtml::activeDropDownList($this, "[$id]trial", $trials, array('empty' => 'Any'));
         echo '</div>';
-
-        echo CHtml::activeHiddenField($this, "[$id]id");
     }
 
     /**
@@ -89,16 +81,13 @@ class PatientMedicationParameter extends CaseSearchParameter
         // Construct your SQL query here.
         if ($searchProvider->getProviderID()  === 'mysql')
         {
-            $wildcard = ''; // This will only be set for 'contains' operations. Other operations will not use wildcards so they are left blank.
             switch ($this->operation)
             {
-                case 'LIKE':
-                    $op = 'LIKE';
-                    $wildcard = '%';
+                case '=':
+                    $op = '=';
                     break;
-                case 'UNLIKE':
-                    $op = 'NOT LIKE';
-                    $wildcard = '%';
+                case '!=':
+                    $op = '!=';
                     break;
                 default:
                     throw new CHttpException(400, 'Invalid operator specified.');
@@ -108,19 +97,17 @@ class PatientMedicationParameter extends CaseSearchParameter
             return "
 SELECT p.id 
 FROM patient p 
-JOIN medication m 
-  ON m.patient_id = p.id 
-LEFT JOIN drug d 
-  ON d.id = m.drug_id
-LEFT JOIN medication_drug md
-  ON md.id = m.medication_drug_id
-WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
-  OR md.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'";
+JOIN trial_patient t_p 
+  ON t_p.patient_id = p.id 
+LEFT JOIN trial t
+  ON t.id = t_p.trial_id
+WHERE :p_t_trial_$this->id IS NULL OR t.name $op :p_t_trial_$this->id";
         }
         else
         {
             return null; // Not yet implemented.
         }
+        return null;
     }
 
     /**
@@ -131,7 +118,7 @@ WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
     {
         // Construct your list of bind values here. Use the format "bind" => "value".
         return array(
-            "p_m_value_$this->id" => $this->textValue,
+            "p_t_trial_$this->id" => $this->trial,
         );
     }
 
@@ -154,10 +141,10 @@ WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
             {
                 $query .= ' AND ';
             }
-            $query .= "$joinAlias.$key = p_m_$this->id.$column";
+            $query .= "$joinAlias.$key = p_t_$this->id.$column";
         }
 
-        $query = " JOIN ($subQuery) p_m_$this->id ON " . $query;
+        $query = " JOIN ($subQuery) p_t_$this->id ON " . $query;
 
         return $query;
     }
@@ -168,6 +155,6 @@ WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
     */
     public function alias()
     {
-        return "p_m_$this->id";
+        return "p_t_$this->id";
     }
 }

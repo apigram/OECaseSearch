@@ -117,26 +117,37 @@ class PatientAgeParameter extends CaseSearchParameter
             '!=' => '!=',
             'BETWEEN' => 'between'
         );
+        echo '<div class="large-2 column">';
         echo CHtml::label($this->getKey(), false);
+        echo '</div>';
+        echo '<div class="large-2 column">';
         echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('onchange' => 'refreshValues(this)', 'prompt' => 'Select One...'));
+        echo CHtml::error($this, "[$id]operation");
+        echo '</div>';
 
         if ($this->operation === 'BETWEEN') {
-            echo '<div class="dual-value" style="display: inline-block;"> ';
+            echo '<div class="dual-value large-6 column" style="display: inline-block;"> ';
             echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min'));
             echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max'));
+            echo CHtml::error($this, "[$id]minValue");
+            echo CHtml::error($this, "[$id]maxValue");
             echo '</div> ';
-            echo '<div class="single-value" style="display: none;"> ';
+            echo '<div class="single-value large-4 column" style="display: none;"> ';
             echo CHtml::activeTextField($this, "[$id]textValue");
+            echo CHtml::error($this, "[$id]textValue");
             echo '</div>';
         }
         else
         {
-            echo '<div class="dual-value" style="display: none;"> ';
+            echo '<div class="dual-value large-6 column" style="display: none;"> ';
             echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min'));
             echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max'));
+            echo CHtml::error($this, "[$id]minValue");
+            echo CHtml::error($this, "[$id]maxValue");
             echo '</div> ';
-            echo '<div class="single-value"> ';
+            echo '<div class="single-value large-6 column"> ';
             echo CHtml::activeTextField($this, "[$id]textValue");
+            echo CHtml::error($this, "[$id]textValue");
             echo '</div>';
         }
         echo CHtml::activeHiddenField($this, "[$id]id");

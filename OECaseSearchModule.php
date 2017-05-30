@@ -20,10 +20,13 @@ class OECaseSearchModule extends CWebModule
     public function init()
     {
         // import the module-level models and components
-        $this->setImport(array(
-            'OECaseSearch.models.*',
-            'OECaseSearch.components.*',
-        ));
+        $trialModule = array('OETrial.models.*');
+        $this->setImport(array_merge(array(
+                'OECaseSearch.models.*',
+                'OECaseSearch.components.*',
+            ),
+            isset(Yii::app()->modules['OETrial'])? $trialModule : null)
+        );
 
         // Initialise the search provider/s.
         foreach ($this->providers as $providerID => $searchProvider)

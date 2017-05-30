@@ -19,7 +19,7 @@ class AutoCompleteController extends BaseModuleController
         return array(
             array(
                 'allow',
-                'actions' => array('commonDiagnoses', 'commonMedicines'),
+                'actions' => array('commonDiagnoses', 'commonMedicines', 'commonAllergies'),
                 'users' => array('@'),
             ),
         );
@@ -42,7 +42,7 @@ class AutoCompleteController extends BaseModuleController
     }
 
     /**
-     * Get the first 30 diagnosis matches for the given text. This is executed through an implicit AJAX request from the CJuiAutoComplete widget.
+     * Get the first 30 medicine matches for the given text. This is executed through an implicit AJAX request from the CJuiAutoComplete widget.
      * @param $term The term supplied from the JUI Autocomplete widget.
      */
     public function actionCommonMedicines($term)
@@ -59,6 +59,25 @@ WHERE LCASE(d.name) LIKE LCASE(:term) OR LCASE(md.name) LIKE LCASE(:term) ORDER 
         foreach ($medicines as $medicine)
         {
             $values[] = $medicine->getDrugLabel();
+        }
+
+        echo CJSON::encode($values);
+    }
+
+    /**
+     * Get the first 30 allergy matches for the given text. This is executed through an implicit AJAX request from the CJuiAutoComplete widget.
+     * @param $term The term supplied from the JUI Autocomplete widget.
+     */
+    public function actionCommonAllergies($term)
+    {
+        $allergies = Allergy::model()->findAllBySql("
+SELECT a.*
+FROM allergy a 
+WHERE LCASE(a.name) LIKE LCASE(:term) ORDER BY a.name LIMIT 30", array('term' => "%$term%"));
+        $values = array();
+        foreach ($allergies as $allergy)
+        {
+            $values[] = $allergy->name;
         }
 
         echo CJSON::encode($values);

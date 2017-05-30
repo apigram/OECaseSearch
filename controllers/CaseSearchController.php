@@ -49,6 +49,7 @@ class CaseSearchController extends BaseModuleController
                 }
             }
         }
+        // This should only run if there are parameters and if all parameters are valid
         if (!empty($parameters) and $valid) {
             $this->actionClear();
             $results = $this->module->getSearchProvider('mysql')->search($parameters);
@@ -66,8 +67,11 @@ class CaseSearchController extends BaseModuleController
                 $_SESSION['last_search'] = $ids;
             }
         }
+
+        // If there are no IDs found, pass -1 as the value (as this will not match with anything).
         $criteria->compare('id', empty($ids) ? -1 : $ids);
 
+        // A data provider is used here to allow faster search times. Results are iterated through using the data provider's pagination functionality and the CListView widget's pager.
         $patientData = new CActiveDataProvider('Patient', array(
             'criteria' => $criteria,
             'totalItemCount' => count($ids),
@@ -75,6 +79,8 @@ class CaseSearchController extends BaseModuleController
                 'pageSize' => 10
             )
         ));
+
+        // Get the list of parameter types for display on-screen.
         $paramList = $this->module->getParamList();
 
         $this->render('index', array(

@@ -1,5 +1,5 @@
 <?php
-class PatientMedicationParameter extends CaseSearchParameter
+class PatientAllergyParameter extends CaseSearchParameter
 {
     public $textValue;
 
@@ -10,13 +10,13 @@ class PatientMedicationParameter extends CaseSearchParameter
     public function __construct($scenario = '')
     {
         parent::__construct($scenario);
-        $this->name = 'medication';
+        $this->name = 'patient allergy';
     }
 
     public function getKey()
     {
         // This is a human-readable value, so feel free to change this as required.
-        return 'Medication';
+        return 'Patient Allergy';
     }
 
     /**
@@ -39,7 +39,7 @@ class PatientMedicationParameter extends CaseSearchParameter
     {
         return array_merge(parent::rules(), array(
                 array('textValue', 'required'),
-                array('textValue', 'safe')
+                array('textValue', 'safe'),
             )
         );
     }
@@ -48,8 +48,8 @@ class PatientMedicationParameter extends CaseSearchParameter
     {
         // Place screen-rendering code here.
         $ops = array(
-            'LIKE' => 'Has taken ',
-            'UNLIKE' => 'Has not taken',
+            '=' => 'is allergic to',
+            '!=' => 'is not allergic to'
         );
 
         echo '<div class="large-1 column">';
@@ -60,12 +60,12 @@ class PatientMedicationParameter extends CaseSearchParameter
         echo CHtml::error($this, "[$id]operation");
         echo '</div>';
 
-        echo '<div class="large-6 column"> ';
+        echo '<div class="single-value large-6 column"> ';
         $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
-            'name' => 'medication',
+            'name' => 'allergy',
             'model' => $this,
             'attribute' => "[$id]textValue",
-            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonMedicines'),
+            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonAllergies'),
             'options' => array(
                 'minLength' => 2,
             ),
@@ -74,8 +74,6 @@ class PatientMedicationParameter extends CaseSearchParameter
         echo $html;
         echo CHtml::error($this, "[$id]textValue");
         echo '</div>';
-
-        echo CHtml::activeHiddenField($this, "[$id]id");
     }
 
     /**
@@ -89,16 +87,13 @@ class PatientMedicationParameter extends CaseSearchParameter
         // Construct your SQL query here.
         if ($searchProvider->getProviderID()  === 'mysql')
         {
-            $wildcard = ''; // This will only be set for 'contains' operations. Other operations will not use wildcards so they are left blank.
             switch ($this->operation)
             {
-                case 'LIKE':
-                    $op = 'LIKE';
-                    $wildcard = '%';
+                case '=':
+                    $op = '=';
                     break;
-                case 'UNLIKE':
-                    $op = 'NOT LIKE';
-                    $wildcard = '%';
+                case '!=':
+                    $op = '!=';
                     break;
                 default:
                     throw new CHttpException(400, 'Invalid operator specified.');
@@ -108,14 +103,11 @@ class PatientMedicationParameter extends CaseSearchParameter
             return "
 SELECT p.id 
 FROM patient p 
-JOIN medication m 
-  ON m.patient_id = p.id 
-LEFT JOIN drug d 
-  ON d.id = m.drug_id
-LEFT JOIN medication_drug md
-  ON md.id = m.medication_drug_id
-WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
-  OR md.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'";
+JOIN patient_allergy_assignment paa
+  ON paa.patient_id = p.id
+JOIN allergy a
+  ON a.id = paa.allergy_id
+WHERE a.name $op :p_m_textValue_$this->id";
         }
         else
         {
@@ -131,7 +123,7 @@ WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
     {
         // Construct your list of bind values here. Use the format "bind" => "value".
         return array(
-            "p_m_value_$this->id" => $this->textValue,
+            "p_al_textValue_$this->id" => $this->textValue,
         );
     }
 
@@ -168,6 +160,6 @@ WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
     */
     public function alias()
     {
-        return "p_m_$this->id";
+        return "p_al_$this->id";
     }
 }

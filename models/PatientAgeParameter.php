@@ -250,7 +250,7 @@ class PatientAgeParameter extends CaseSearchParameter
         // Construct your JOIN condition here. Generally this involves wrapping the query in a JOIN condition.
         $subQuery = $this->query($searchProvider);
         $query = '';
-        $alias = $this->getAlias();
+        $alias = $this->alias();
         foreach ($criteria as $key => $column)
         {
             // if the string isn't empty, the condition is not the first so prepend it with an AND.

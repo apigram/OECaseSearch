@@ -1,22 +1,24 @@
 <?php
-class PatientDiagnosisParameter extends CaseSearchParameter
+class FamilyHistoryParameter extends CaseSearchParameter
 {
-    public $textValue;
+    public $relative;
+    public $side;
+    public $condition;
 
     /**
-    * PatientAgeParameter constructor. This overrides the parent constructor so that the name can be immediately set.
+    * CaseSearchParameter constructor. This overrides the parent constructor so that the name can be immediately set.
     * @param string $scenario
     */
     public function __construct($scenario = '')
     {
         parent::__construct($scenario);
-        $this->name = 'diagnosis';
+        $this->name = 'family_history';
     }
 
     public function getKey()
     {
         // This is a human-readable value, so feel free to change this as required.
-        return 'Diagnosis';
+        return 'Family History';
     }
 
     /**
@@ -25,7 +27,12 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     */
     public function attributeNames()
     {
-        return array_merge(parent::attributeNames(), array('textValue'));
+        return array_merge(parent::attributeNames(), array(
+                'relative',
+                'side',
+                'condition',
+            )
+        );
     }
 
     /**
@@ -35,50 +42,65 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     public function rules()
     {
         return array_merge(parent::rules(), array(
-                array('textValue', 'required'),
-                array('textValue', 'safe')
+                array('condition', 'required'),
+                array('relative, side, condition', 'safe')
             )
         );
     }
 
     public function renderParameter($id)
     {
-        // Place screen-rendering code here.
         $ops = array(
-            '=' => 'Diagnosed with',
-            '!=' => 'Not diagnosed with'
+            '=' => 'has',
+            '!=' => 'does not have'
         );
+        $relativeList = FamilyHistoryRelative::model()->findAll();
+        $sideList = FamilyHistorySide::model()->findAll();
+        $conditionList = FamilyHistoryCondition::model()->findAll();
 
-        echo '<div class="large-1 column">';
-        echo CHtml::label('Patient', false);
+        $relatives = array();
+        $sides = array();
+        $conditions = array();
+
+        foreach ($relativeList as $relative) {
+            $relatives[$relative->id] = $relative->name;
+        }
+
+        foreach ($sideList as $side) {
+            if ($side !== 'N/A') {
+                $sides[$side->id] = $side->name;
+            }
+        }
+
+        foreach ($conditionList as $condition) {
+            $conditions[$condition->id] = $condition->name;
+        }
+        // Place screen-rendering code here.
+
+        echo '<div class="large-2 column">';
+        echo CHtml::activeDropDownList($this, "[$id]side", $sides, array('empty' => 'Any side'));
         echo '</div>';
-        echo '<div class="large-3 column">';
+        
+        echo '<div class="large-2 column">';
+        echo CHtml::activeDropDownList($this, "[$id]relative", $relatives, array('empty' => 'Any relative'));
+        echo '</div>';
+
+        echo '<div class="large-2 column">';
         echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
         echo CHtml::error($this, "[$id]operation");
         echo '</div>';
-
-        echo '<div class="single-value large-6 column"> ';
-        $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
-            'name' => 'diagnosis',
-            'model' => $this,
-            'attribute' => "[$id]textValue",
-            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonDiagnoses'),
-            'options' => array(
-                'minLength' => 2,
-            ),
-        ), true);
-        Yii::app()->clientScript->render($html);
-        echo $html;
-        echo CHtml::error($this, "[$id]textValue");
+        echo '<div class="large-2 column">';
+        echo CHtml::activeDropDownList($this, "[$id]condition", $conditions, array('prompt' => 'Select One...'));
+        echo CHtml::error($this, "[$id]condition");
         echo '</div>';
     }
 
     /**
-     * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
-     * @return mixed The constructed query string.
+    * Generate a SQL fragment representing the subquery of a FROM condition.
+    * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+    * @return mixed The constructed query string.
      * @throws CHttpException
-     */
+    */
     public function query($searchProvider)
     {
         // Construct your SQL query here.
@@ -92,21 +114,19 @@ class PatientDiagnosisParameter extends CaseSearchParameter
                 case '!=':
                     $op = '!=';
                     break;
-                case 'contains':
-                    $op = 'LIKE';
-                    break;
                 default:
                     throw new CHttpException(400, 'Invalid operator specified.');
                     break;
             }
 
-            return "SELECT p.id 
+            return "
+SELECT p.id 
 FROM patient p 
-JOIN secondary_diagnosis sd 
-  ON sd.patient_id = p.id 
-JOIN disorder d 
-  ON d.id = sd.disorder_id 
-WHERE d.term $op :p_d_value_$this->id";
+JOIN family_history fh
+  ON fh.patient_id = p.id
+WHERE (:f_h_side_$this->id IS NULL OR fh.side_id $op :f_h_side_$this->id)
+  AND (:f_h_relative_$this->id IS NULL OR fh.relative_id $op :f_h_relative_$this->id)
+  AND (:f_h_condition_$this->id $op :f_h_condition_$this->id)";
         }
         else
         {
@@ -120,9 +140,11 @@ WHERE d.term $op :p_d_value_$this->id";
     */
     public function bindValues()
     {
-        // Construct your list of bind values here. Use the format ":bind" => "value".
+        // Construct your list of bind values here. Use the format "bind" => "value".
         return array(
-            "p_d_value_$this->id" => $this->textValue,
+            "f_h_relative_$this->id" => $this->relative,
+            "f_h_side_$this->id" => $this->side,
+            "f_h_condition_$this->id" => $this->condition,
         );
     }
 
@@ -160,6 +182,6 @@ WHERE d.term $op :p_d_value_$this->id";
     */
     public function alias()
     {
-        return "p_d_$this->id";
+        return "f_h_$this->id";
     }
 }

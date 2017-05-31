@@ -4,6 +4,7 @@
 $this->breadcrumbs = array(
     $this->module->id,
 );
+$this->pageTitle = 'OpenEyes - Case Search'
 ?>
 <h1 class="badge">Case Search</h1>
 
@@ -37,7 +38,7 @@ $this->breadcrumbs = array(
       </div>
       <div class="search-actions">
         <?php echo CHtml::submitButton('Search');?>
-        <?php echo CHtml::button('Clear', array('id' => 'clear-search', 'class' => 'button secondary')) ?>
+        <?php echo CHtml::button('Clear', array('id' => 'clear-search', 'class' => 'button event-action cancel')) ?>
       </div>
 
       <?php $this->endWidget();?>

@@ -134,6 +134,7 @@ WHERE :p_t_trial_$this->id IS NULL OR t.name $op :p_t_trial_$this->id";
         // Construct your JOIN condition here. Generally this involves wrapping the query in a JOIN condition.
         $subQuery = $this->query($searchProvider);
         $query = '';
+        $alias = $this->getAlias();
         foreach ($criteria as $key => $column)
         {
             // if the string isn't empty, the condition is not the first so prepend it with an AND.
@@ -141,10 +142,10 @@ WHERE :p_t_trial_$this->id IS NULL OR t.name $op :p_t_trial_$this->id";
             {
                 $query .= ' AND ';
             }
-            $query .= "$joinAlias.$key = p_t_$this->id.$column";
+            $query .= "$joinAlias.$key = $alias.$column";
         }
 
-        $query = " JOIN ($subQuery) p_t_$this->id ON " . $query;
+        $query = " JOIN ($subQuery) $alias ON " . $query;
 
         return $query;
     }

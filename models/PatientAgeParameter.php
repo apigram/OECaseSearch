@@ -247,8 +247,10 @@ class PatientAgeParameter extends CaseSearchParameter
      */
     public function join($joinAlias, $criteria, $searchProvider)
     {
+        // Construct your JOIN condition here. Generally this involves wrapping the query in a JOIN condition.
         $subQuery = $this->query($searchProvider);
         $query = '';
+        $alias = $this->getAlias();
         foreach ($criteria as $key => $column)
         {
             // if the string isn't empty, the condition is not the first so prepend it with an AND.
@@ -256,10 +258,10 @@ class PatientAgeParameter extends CaseSearchParameter
             {
                 $query .= ' AND ';
             }
-            $query .= "$joinAlias.$key = p_a_$this->id.$column";
+            $query .= "$joinAlias.$key = $alias.$column";
         }
 
-        $query = " JOIN ($subQuery) p_a_$this->id ON " . $query;
+        $query = " JOIN ($subQuery) $alias ON " . $query;
 
         return $query;
     }

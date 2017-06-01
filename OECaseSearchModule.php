@@ -16,6 +16,7 @@ class OECaseSearchModule extends CWebModule
      */
     public $providers = array();
     private $searchProviders = array();
+    private $_assetsUrl;
 
     public function init()
     {
@@ -34,10 +35,15 @@ class OECaseSearchModule extends CWebModule
             $this->searchProviders[$providerID] = new $searchProvider($providerID);
         }
 
-        $path = Yii::app()->assetManager->publish(Yii::getPathOfAlias('application.modules.OECaseSearch.assets'));
-        Yii::app()->clientScript->registerScriptFile($path . '/js/QueryBuilder.js');
+    }
 
-        Yii::app()->clientScript->registerCssFile($path . '/css/QueryBuilder.css');
+    public function getAssetsUrl()
+    {
+        if ($this->_assetsUrl === null)
+        {
+            $this->_assetsUrl = Yii::app()->assetManager->publish(Yii::getPathOfAlias('application.modules.OECaseSearch.assets'));
+        }
+        return $this->_assetsUrl;
     }
 
     /**

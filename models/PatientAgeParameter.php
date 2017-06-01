@@ -74,21 +74,21 @@ class PatientAgeParameter extends CaseSearchParameter
 
     /**
      * Validator to validate parameter values for specific operators.
-     * @param $attribute Attribute being validated.
+     * @param string $attribute Attribute being validated.
      */
     public function values($attribute)
     {
         $label = $this->attributeLabels()[$attribute];
         if ($attribute === 'minValue' or $attribute === 'maxValue')
         {
-            if ($this->operation === 'BETWEEN' and empty($this->attributes[$attribute]))
+            if ($this->operation === 'BETWEEN' and (empty($this->$attribute) or !isset($this->$attribute)))
             {
                 $this->addError($attribute, "$label must be specified.");
             }
         }
         else
         {
-            if ($this->operation !== 'BETWEEN' and empty($this->attributes[$attribute]))
+            if ($this->operation !== 'BETWEEN' and (empty($this->$attribute) or !isset($this->$attribute)))
             {
                 $this->addError($attribute, "$label must be specified.");
             }

@@ -80,3 +80,5 @@ $('#clear-search').click(function() {
     }
   });
 });");
+Yii::app()->clientScript->registerScriptFile($this->module->getAssetsUrl() . '/js/QueryBuilder.js');
+Yii::app()->clientScript->registerCssFile($this->module->getAssetsUrl() . '/css/QueryBuilder.css');

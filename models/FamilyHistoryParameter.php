@@ -124,8 +124,8 @@ SELECT p.id
 FROM patient p 
 JOIN family_history fh
   ON fh.patient_id = p.id
-WHERE (:f_h_side_$this->id IS NULL OR fh.side_id $op :f_h_side_$this->id)
-  AND (:f_h_relative_$this->id IS NULL OR fh.relative_id $op :f_h_relative_$this->id)
+WHERE (:f_h_side_$this->id IS NULL OR fh.side_id = :f_h_side_$this->id)
+  AND (:f_h_relative_$this->id IS NULL OR fh.relative_id = :f_h_relative_$this->id)
   AND (:f_h_condition_$this->id $op :f_h_condition_$this->id)";
         }
         else

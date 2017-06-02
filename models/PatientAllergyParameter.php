@@ -107,7 +107,7 @@ JOIN patient_allergy_assignment paa
   ON paa.patient_id = p.id
 JOIN allergy a
   ON a.id = paa.allergy_id
-WHERE a.name $op :p_m_textValue_$this->id";
+WHERE a.name $op :p_al_textValue_$this->id";
         }
         else
         {

@@ -8,17 +8,17 @@ function removeParam(elm) {
 function refreshValues(elm) {
   if ($(elm).val() === 'BETWEEN') {
     // Display the two text fields.
-    $(elm).parents('.row').find('.single-value').find('input').val('');
-    $(elm).parents('.row').find('.dual-value').show();
-    $(elm).parents('.row').find('.dual-value').css("display", "inline-block");
-    $(elm).parents('.row').find('.single-value').hide();
+    $(elm).parent().parent('.row').find('.single-value').find('input').val('');
+    $(elm).parent().parent('.row').find('.dual-value').show();
+    $(elm).parent().parent('.row').find('.dual-value').css("display", "inline-block");
+    $(elm).parent().parent('.row').find('.single-value').hide();
   }
   else {
     // Display the single text field
-    $(elm).parents('.row').find('.dual-value').find('input').val('');
-    $(elm).parents('.row').find('.dual-value').hide();
-    $(elm).parents('.row').find('.single-value').show();
-    $(elm).parents('.row').find('.single-value').css("display", "inline-block");
+    $(elm).parent().parent('.row').find('.dual-value').find('input').val('');
+    $(elm).parent().parent('.row').find('.dual-value').hide();
+    $(elm).parent().parent('.row').find('.single-value').show();
+    $(elm).parent().parent('.row').find('.single-value').css("display", "inline-block");
   }
 }
 

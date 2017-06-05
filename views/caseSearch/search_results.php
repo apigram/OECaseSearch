@@ -13,7 +13,7 @@
         <div class="large-12 column">
             <?php
             $now = new DateTime();
-            echo $data->gender . ' ' . '(' . $now->diff(new DateTime($data->dob))->y . ')';
+            echo $data->getGenderString() . ' ' . '(' . $now->diff(new DateTime($data->dob))->y . ')';
             ?>
         </div>
     </div>

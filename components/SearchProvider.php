@@ -9,7 +9,7 @@ abstract class SearchProvider
 
     /**
      * SearchProvider constructor.
-     * @param $id An identifier uniquely identifying the search provider.
+     * @param $id mixed An identifier uniquely identifying the search provider.
      */
     public function __construct($id)
     {
@@ -18,7 +18,7 @@ abstract class SearchProvider
 
     /**
      * Perform a search using the specified parameters.
-     * @param $parameters A list of Parameter objects representing a search parameter.
+     * @param $parameters array A list of CaseSearchParameter objects representing a search parameter.
      * @return mixed Search results. This will take whatever form is specified within the subclass' executeSearch implementation.
      */
     public final function search($parameters)
@@ -36,9 +36,9 @@ abstract class SearchProvider
     }
 
     /**
-     * Search delegate function.
-     * @param $criteria A list of search parameters.
-     * @return mixed Search results.
+     * Search delegate function. Implement this function to specify how the search will be executed.
+     * @param $criteria array A list of search parameters.
+     * @return array Search results.
      */
     abstract protected function executeSearch($criteria);
 }

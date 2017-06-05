@@ -52,14 +52,14 @@ abstract class CaseSearchParameter extends CFormModel
 
     /**
      * Render the parameter on-screen.
-     * @param $id The position of the parameter in the list of parameters.
+     * @param $id integer The position of the parameter in the list of parameters.
      */
     abstract public function renderParameter($id);
 
     /**
      * Generate a SQL fragment representing the subquery of a FROM condition.
      * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
-     * @return mixed The constructed query string.
+     * @return string The constructed query string.
      */
     abstract public function query($searchProvider);
 
@@ -71,9 +71,9 @@ abstract class CaseSearchParameter extends CFormModel
 
     /**
      * Generate a SQL fragment representing a JOIN condition to a subquery.
-     * @param $joinAlias The alias of the table being joined to.
-     * @param $criteria An array of join conditions. The ID for each element is the column name from the aliased table.
-     * @param $searchProvider The search provider. This is used for an internal query invocation for subqueries.
+     * @param $joinAlias string The alias of the table being joined to.
+     * @param $criteria string An array of join conditions. The ID for each element is the column name from the aliased table.
+     * @param $searchProvider SearchProvider search provider. This is used for an internal query invocation for subqueries.
      * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
      */
     abstract public function join($joinAlias, $criteria, $searchProvider);

@@ -40,16 +40,21 @@ class PreviousTrialParameterTest extends CTestCase
         // Ensure the query is correct for each operator and returns a set of results.
         foreach ($correctOps as $operator) {
             $this->object->operation = $operator;
+            if ($operator === '=') {
+                $joinCondition = 'JOIN';
+                $condition = ":p_t_trial_0 = '' OR t_p.trial_id = :p_t_trial_0";
+            }
+            else if ($operator === '!=') {
+                $joinCondition = 'LEFT JOIN';
+                $condition = "(:p_t_trial_0 = '' AND t_p.trial_id IS NULL) OR (t_p.trial_id IS NULL OR t_p.trial_id != :p_t_trial_0)";
+            }
             $sqlValue = "
 SELECT p.id 
 FROM patient p 
-JOIN trial_patient t_p 
+$joinCondition trial_patient t_p 
   ON t_p.patient_id = p.id 
-LEFT JOIN trial t
-  ON t.id = t_p.trial_id
-WHERE :p_t_trial_0 IS NULL OR t.name $operator :p_t_trial_0";
+WHERE $condition";
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
-
         }
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.

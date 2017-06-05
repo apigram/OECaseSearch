@@ -25,7 +25,7 @@ class PatientAgeParameter extends CaseSearchParameter
 
     /**
      * PatientAgeParameter constructor. This overrides the parent constructor so that the name can be immediately set.
-     * @param string $scenario
+     * @param string $scenario Model scenario.
      */
     public function __construct($scenario = '')
     {
@@ -74,7 +74,7 @@ class PatientAgeParameter extends CaseSearchParameter
 
     /**
      * Validator to validate parameter values for specific operators.
-     * @param string $attribute Attribute being validated.
+     * @param $attribute string Attribute being validated.
      */
     public function values($attribute)
     {
@@ -104,7 +104,7 @@ class PatientAgeParameter extends CaseSearchParameter
     }
 
     /**
-     * @param The $id of the parameter for rendering purposes.
+     * @param $id integer ID of the parameter for rendering purposes.
      */
     public function renderParameter($id)
     {
@@ -157,7 +157,7 @@ class PatientAgeParameter extends CaseSearchParameter
 
     /**
      * Generate the SQL query for patient age.
-     * @param The $searchProvider building the query.
+     * @param $searchProvider SearchProvider The search provider building the query.
      * @return null|string The query string for use by the search provider, or null if not implemented for the specified search provider.
      * @throws CHttpException
      */
@@ -242,9 +242,9 @@ class PatientAgeParameter extends CaseSearchParameter
     }
 
     /**
-     * @param $joinAlias of the table.
-     * @param A $criteria used for JOINs.
-     * @param $searchProvider constructing the JOIN SQL statement.
+     * @param $joinAlias string Alias of the table.
+     * @param $criteria string Criteria used for JOINs.
+     * @param $searchProvider SearchProvider The search provider constructing the JOIN SQL statement.
      * @return string The constructed SQL JOIN statement.
      */
     public function join($joinAlias, $criteria, $searchProvider)

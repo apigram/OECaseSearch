@@ -9,7 +9,7 @@
     <?php $model->renderParameter($id); ?>
     <?php echo CHtml::activeHiddenField($model, "[$id]id"); ?>
     <div class="large-1 column end">
-      <?php echo CHtml::link('Remove', '#', array('onclick'=> 'removeParam(this)', 'class' => 'remove-link')); ?>
+      <?php echo CHtml::link('Remove', 'javascript:void(0)', array('onclick'=> 'removeParam(this)', 'class' => 'remove-link')); ?>
     </div>
   </div>
 </div><!-- form -->

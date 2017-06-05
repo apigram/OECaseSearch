@@ -48,19 +48,19 @@ class PatientAllergyParameter extends CaseSearchParameter
     {
         // Place screen-rendering code here.
         $ops = array(
-            '=' => 'is allergic to',
-            '!=' => 'is not allergic to'
+            '=' => 'Is allergic to',
+            '!=' => 'Is not allergic to'
         );
 
-        echo '<div class="large-1 column">';
-        echo CHtml::label('Patient', false);
+        echo '<div class="large-2 column">';
+        echo CHtml::label($this->getKey(), false);
         echo '</div>';
         echo '<div class="large-3 column">';
         echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
         echo CHtml::error($this, "[$id]operation");
         echo '</div>';
 
-        echo '<div class="single-value large-6 column"> ';
+        echo '<div class="large-5 column"> ';
         $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
             'name' => 'allergy',
             'model' => $this,

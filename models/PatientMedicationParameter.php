@@ -52,15 +52,15 @@ class PatientMedicationParameter extends CaseSearchParameter
             'UNLIKE' => 'Has not taken',
         );
 
-        echo '<div class="large-1 column">';
-        echo CHtml::label('Patient', false);
+        echo '<div class="large-2 column">';
+        echo CHtml::label($this->getKey(), false);
         echo '</div>';
         echo '<div class="large-3 column">';
         echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
         echo CHtml::error($this, "[$id]operation");
         echo '</div>';
 
-        echo '<div class="large-6 column"> ';
+        echo '<div class="large-5 column"> ';
         $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
             'name' => 'medication',
             'model' => $this,

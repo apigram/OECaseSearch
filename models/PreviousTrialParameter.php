@@ -47,8 +47,8 @@ class PreviousTrialParameter extends CaseSearchParameter
     {
         // Place screen-rendering code here.
         $ops = array(
-            '=' => 'has been in trial',
-            '!=' => 'has never been in trial'
+            '=' => 'Has been in trial',
+            '!=' => 'Has never been in trial'
         );
 
         $trialModels = Trial::model()->findAll();
@@ -57,15 +57,15 @@ class PreviousTrialParameter extends CaseSearchParameter
             $trials[$trial->id] = "$trial->name - $trial->description";
         }
 
-        echo '<div class="large-1 column">';
-        echo CHtml::label('Patient', false);
+        echo '<div class="large-2 column">';
+        echo CHtml::label($this->getKey(), false);
         echo '</div>';
         echo '<div class="large-3 column">';
         echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
         echo CHtml::error($this, "[$id]operation");
         echo '</div>';
 
-        echo '<div class="large-6 column"> ';
+        echo '<div class="large-5 column"> ';
         echo CHtml::activeDropDownList($this, "[$id]trial", $trials, array('empty' => 'Any'));
         echo '</div>';
     }
@@ -84,10 +84,12 @@ class PreviousTrialParameter extends CaseSearchParameter
             switch ($this->operation)
             {
                 case '=':
-                    $op = '=';
+                    $joinCondition = 'JOIN';
+                    $condition = ":p_t_trial_$this->id = '' OR t_p.trial_id = :p_t_trial_$this->id";
                     break;
                 case '!=':
-                    $op = '!=';
+                    $joinCondition = 'LEFT JOIN';
+                    $condition = "(:p_t_trial_$this->id = '' AND t_p.trial_id IS NULL) OR (t_p.trial_id IS NULL OR t_p.trial_id != :p_t_trial_$this->id)";
                     break;
                 default:
                     throw new CHttpException(400, 'Invalid operator specified.');
@@ -97,11 +99,9 @@ class PreviousTrialParameter extends CaseSearchParameter
             return "
 SELECT p.id 
 FROM patient p 
-JOIN trial_patient t_p 
+$joinCondition trial_patient t_p 
   ON t_p.patient_id = p.id 
-LEFT JOIN trial t
-  ON t.id = t_p.trial_id
-WHERE :p_t_trial_$this->id IS NULL OR t.name $op :p_t_trial_$this->id";
+WHERE $condition";
         }
         else
         {
@@ -118,7 +118,7 @@ WHERE :p_t_trial_$this->id IS NULL OR t.name $op :p_t_trial_$this->id";
     {
         // Construct your list of bind values here. Use the format "bind" => "value".
         return array(
-            "p_t_trial_$this->id" => $this->trial,
+            "p_t_trial_$this->id" => ($this->trial === '') ? null : $this->trial,
         );
     }
 

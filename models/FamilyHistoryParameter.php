@@ -78,6 +78,10 @@ class FamilyHistoryParameter extends CaseSearchParameter
         // Place screen-rendering code here.
 
         echo '<div class="large-2 column">';
+        echo CHtml::label($this->getKey(), false);
+        echo '</div>';
+
+        echo '<div class="large-2 column">';
         echo CHtml::activeDropDownList($this, "[$id]side", $sides, array('empty' => 'Any side'));
         echo '</div>';
         

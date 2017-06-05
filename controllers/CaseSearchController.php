@@ -3,6 +3,8 @@
 class CaseSearchController extends BaseModuleController
 {
     public $layout = '//layouts/main';
+    public $trialContext;
+
     public function filters()
     {
         return array(
@@ -25,14 +27,20 @@ class CaseSearchController extends BaseModuleController
 
     /**
      * Primary case search action.
+     * @param $trial_id integer The Trial that this case search is in context of
      */
-    public function actionIndex()
+    public function actionIndex($trial_id = null)
     {
         $valid = true;
         $parameters = array();
         $ids = array();
         if (isset($_SESSION['last_search'])) {
             $ids = $_SESSION['last_search'];
+        }
+
+        $this->trialContext = null;
+        if ($trial_id != null) {
+            $this->trialContext = Trial::model()->findByPk($trial_id);
         }
 
         $criteria = new CDbCriteria();
@@ -52,7 +60,8 @@ class CaseSearchController extends BaseModuleController
         // This should only run if there are parameters and if all parameters are valid
         if (!empty($parameters) and $valid) {
             $this->actionClear();
-            $results = $this->module->getSearchProvider('mysql')->search($parameters);
+            $searchProvider = $this->module->getSearchProvider('mysql');
+            $results = $searchProvider->search($parameters);
 
             $ids = array();
 
@@ -62,8 +71,7 @@ class CaseSearchController extends BaseModuleController
             }
 
             // Only copy to the $_SESSION array if it isn't already there - Shallow copy is done at the start if it is already set.
-            if (!isset($_SESSION['last_search']) or empty($_SESSION['last_search']))
-            {
+            if (!isset($_SESSION['last_search']) or empty($_SESSION['last_search'])) {
                 $_SESSION['last_search'] = $ids;
             }
         }
@@ -77,7 +85,7 @@ class CaseSearchController extends BaseModuleController
             'totalItemCount' => count($ids),
             'pagination' => array(
                 'pageSize' => 10
-            )
+            ),
         ));
 
         // Get the list of parameter types for display on-screen.

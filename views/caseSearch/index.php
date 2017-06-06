@@ -32,8 +32,8 @@ $this->pageTitle = 'OpenEyes - Case Search'
                         endforeach;
                     endif; ?>
                 </div>
-                <br/>
 
+              <div class="box generic">
                 <div class="new-param">
                     <?php echo CHtml::dropDownList('Add Parameter: ', 'Select One...', $paramList, array('id' => 'param')); ?>
                     <?php echo CHtml::button('Add Parameter', array('id' => 'add-param', 'class' => 'button secondary small')) ?>
@@ -44,7 +44,7 @@ $this->pageTitle = 'OpenEyes - Case Search'
                 </div>
 
                 <?php $this->endWidget(); ?>
-            </div>
+              </div>
 
             <div id="results">
                 <?php if (isset($patients)) {

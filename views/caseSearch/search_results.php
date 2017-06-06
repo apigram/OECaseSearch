@@ -56,7 +56,7 @@
     <div class="row data-row">
         <div class="large-12 column">
             <h3 class="box-title">
-                Diagnoses <?php echo CHtml::link('Show', '#', array('onclick' => 'event.preventDefault(); toggleDetail(this, ".diagnoses");')) ?></h3>
+                Diagnoses <?php echo CHtml::link('Show', 'javascript:void(0)', array('onclick' => 'event.preventDefault(); toggleDetail(this, ".diagnoses");')) ?></h3>
             <div class="diagnoses detail row data-row">
                 <div class="large-12 column">
                     <table>
@@ -84,7 +84,7 @@
     <div class="row data-row">
         <div class="large-12 column">
             <h3 class="box-title">
-                Medications <?php echo CHtml::link('Show', '#', array('onclick' => 'event.preventDefault(); toggleDetail(this, ".medications");')) ?></h3>
+                Medications <?php echo CHtml::link('Show', 'javascript:void(0)', array('onclick' => 'event.preventDefault(); toggleDetail(this, ".medications");')) ?></h3>
             <div class="medications detail row data-row">
                 <div class="large-12 column">
                     <table>

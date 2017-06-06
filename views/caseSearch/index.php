@@ -8,9 +8,9 @@ $this->breadcrumbs = array(
 );
 $this->pageTitle = 'OpenEyes - Case Search'
 ?>
-    <h1 class="badge"><?php echo $this->trialContext == null ? 'Case Search' : 'Add Patients to Trial'; ?></h1>
+<h1 class="badge"><?php echo $this->trialContext == null ? 'Case Search' : 'Add Patients to Trial'; ?></h1>
 
-    <div class="row">
+<div class="row">
         <div class="large-8 column">
             <div class="form">
                 <?php $form = $this->beginWidget('CActiveForm', array(
@@ -58,9 +58,9 @@ $this->pageTitle = 'OpenEyes - Case Search'
                 ?>
             </div>
         </div>
-    </div>
+</div>
 
-    <script type="text/javascript">
+<script type="text/javascript">
         function addPatientToTrial(patient_id, trial_id) {
             $.ajax({
                 url: '<?php echo Yii::app()->createUrl('/OETrial/trial/addPatient'); ?>',
@@ -94,7 +94,7 @@ $this->pageTitle = 'OpenEyes - Case Search'
                 },
             });
         }
-    </script>
+</script>
 
 
 <?php
@@ -121,4 +121,8 @@ $('#clear-search').click(function() {
 });");
 Yii::app()->clientScript->registerScriptFile($this->module->getAssetsUrl() . '/js/QueryBuilder.js');
 Yii::app()->clientScript->registerCssFile($this->module->getAssetsUrl() . '/css/QueryBuilder.css');
+
+$assetPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets'), false, -1);
+Yii::app()->getClientScript()->registerScriptFile($assetPath . '/js/toggle-section.js');
+?>
 

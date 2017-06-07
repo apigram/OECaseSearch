@@ -2,7 +2,10 @@
 class PatientDiagnosisParameter extends CaseSearchParameter
 {
     public $textValue;
-    public $confirmed;
+    public $isConfirmed;
+
+    const DIAGNOSIS_CONFIRMED = 1;
+    const DIAGNOSIS_UNCONFIRMED = 0;
 
     /**
     * PatientAgeParameter constructor. This overrides the parent constructor so that the name can be immediately set.
@@ -51,8 +54,8 @@ class PatientDiagnosisParameter extends CaseSearchParameter
         );
 
         $diagOptions = array(
-            0 => 'Unconfirmed',
-            1 => 'Confirmed'
+            self::DIAGNOSIS_UNCONFIRMED => 'Unconfirmed',
+            self::DIAGNOSIS_CONFIRMED => 'Confirmed'
         );
 
         echo '<div class="large-2 column">';
@@ -113,7 +116,7 @@ LEFT JOIN secondary_diagnosis sd
 LEFT JOIN disorder d 
   ON d.id = sd.disorder_id 
 WHERE d.term $op :p_d_value_$this->id
-  AND (:p_d_confirmed_$this->id = '' OR (:p_d_confirmed_$this->id = 1 AND sd.is_confirmed IS NULL) OR :p_d_confirmed_$this->id = sd.is_confirmed)";
+  AND (:p_d_confirmed_$this->id = '' OR (:p_d_confirmed_$this->id = " . self::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR :p_d_confirmed_$this->id = sd.is_confirmed)";
         }
         else
         {
@@ -130,7 +133,7 @@ WHERE d.term $op :p_d_value_$this->id
         // Construct your list of bind values here. Use the format ":bind" => "value".
         return array(
             "p_d_value_$this->id" => '%' . $this->textValue . '%',
-            "p_d_confirmed_$this->id" => $this->confirmed,
+            "p_d_confirmed_$this->id" => $this->isConfirmed,
         );
     }
 

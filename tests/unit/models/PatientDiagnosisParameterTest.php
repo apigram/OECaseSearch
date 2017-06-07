@@ -34,7 +34,6 @@ class PatientDiagnosisParameterTest extends CTestCase
         $correctOps = array(
             'LIKE',
             'NOT LIKE',
-            //'LIKE',
         );
         $invalidOps = array(
             '=',
@@ -50,7 +49,7 @@ LEFT JOIN secondary_diagnosis sd
 LEFT JOIN disorder d 
   ON d.id = sd.disorder_id 
 WHERE d.term $operator :p_d_value_0
-  AND (:p_d_confirmed_0 = '' OR (:p_d_confirmed_0 = 1 AND sd.is_confirmed IS NULL) OR :p_d_confirmed_0 = sd.is_confirmed)";
+  AND (:p_d_confirmed_0 = '' OR (:p_d_confirmed_0 = " . PatientDiagnosisParameter::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR :p_d_confirmed_0 = sd.is_confirmed)";
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
 
@@ -68,10 +67,10 @@ WHERE d.term $operator :p_d_value_0
     public function testBindValues()
     {
         $this->object->textValue = 5;
-        $this->object->confirmed = 1;
+        $this->object->isConfirmed = 1;
         $expected = array(
             'p_d_value_0' => '%' . $this->object->textValue . '%',
-            'p_d_confirmed_0' => $this->object->confirmed,
+            'p_d_confirmed_0' => $this->object->isConfirmed,
         );
 
         // Ensure that all bind values are returned.

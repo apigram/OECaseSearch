@@ -32,12 +32,11 @@ class PatientDiagnosisParameterTest extends CTestCase
         $this->object->textValue = 5;
 
         $correctOps = array(
-            '=',
-            '!=',
-            //'LIKE',
+            'LIKE',
+            'NOT LIKE',
         );
         $invalidOps = array(
-            'NOT LIKE',
+            '=',
         );
 
         // Ensure the query is correct for each operator.
@@ -45,11 +44,20 @@ class PatientDiagnosisParameterTest extends CTestCase
             $this->object->operation = $operator;
             $sqlValue = "SELECT p.id 
 FROM patient p 
-JOIN secondary_diagnosis sd 
+LEFT JOIN secondary_diagnosis sd 
   ON sd.patient_id = p.id 
-JOIN disorder d 
+LEFT JOIN disorder d 
   ON d.id = sd.disorder_id 
-WHERE d.term $operator :p_d_value_0";
+WHERE d.term LIKE :p_d_value_0
+  AND (:p_d_confirmed_0 = '' OR (:p_d_confirmed_0 = " . PatientDiagnosisParameter::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR :p_d_confirmed_0 = sd.is_confirmed)";
+            if ($operator === 'NOT LIKE')
+            {
+                $sqlValue = "SELECT p.id 
+FROM patient p
+WHERE p.id NOT IN (
+  $sqlValue
+)";
+            }
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
 
@@ -67,8 +75,10 @@ WHERE d.term $operator :p_d_value_0";
     public function testBindValues()
     {
         $this->object->textValue = 5;
+        $this->object->isConfirmed = 1;
         $expected = array(
-            'p_d_value_0' => $this->object->textValue,
+            'p_d_value_0' => '%' . $this->object->textValue . '%',
+            'p_d_confirmed_0' => $this->object->isConfirmed,
         );
 
         // Ensure that all bind values are returned.
@@ -90,7 +100,7 @@ WHERE d.term $operator :p_d_value_0";
      */
     public function testJoin()
     {
-        $this->object->operation = '=';
+        $this->object->operation = 'LIKE';
         $innerSql = $this->object->query($this->searchProvider);
 
         // Ensure that the JOIN string is correct.

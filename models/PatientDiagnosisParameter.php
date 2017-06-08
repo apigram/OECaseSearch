@@ -2,6 +2,10 @@
 class PatientDiagnosisParameter extends CaseSearchParameter
 {
     public $textValue;
+    public $isConfirmed;
+
+    const DIAGNOSIS_CONFIRMED = 1;
+    const DIAGNOSIS_UNCONFIRMED = 0;
 
     /**
     * PatientAgeParameter constructor. This overrides the parent constructor so that the name can be immediately set.
@@ -25,7 +29,7 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     */
     public function attributeNames()
     {
-        return array_merge(parent::attributeNames(), array('textValue'));
+        return array_merge(parent::attributeNames(), array('textValue', 'isConfirmed'));
     }
 
     /**
@@ -36,7 +40,7 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     {
         return array_merge(parent::rules(), array(
                 array('textValue', 'required'),
-                array('textValue', 'safe')
+                array('textValue, isConfirmed', 'safe')
             )
         );
     }
@@ -45,32 +49,42 @@ class PatientDiagnosisParameter extends CaseSearchParameter
     {
         // Place screen-rendering code here.
         $ops = array(
-            '=' => 'Diagnosed with',
-            '!=' => 'Not diagnosed with'
+            'LIKE' => 'Diagnosed with',
+            'NOT LIKE' => 'Not diagnosed with'
         );
 
-        echo '<div class="large-2 column">';
-        echo CHtml::label($this->getKey(), false);
-        echo '</div>';
-        echo '<div class="large-3 column">';
-        echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
-        echo CHtml::error($this, "[$id]operation");
-        echo '</div>';
+        $diagOptions = array(
+            self::DIAGNOSIS_UNCONFIRMED => 'Unconfirmed',
+            self::DIAGNOSIS_CONFIRMED => 'Confirmed'
+        );
+        ?>
+        <div class="large-2 column">
+            <?php echo CHtml::label($this->getKey(), false); ?>
+        </div>
+        <div class="large-3 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));?>
+            <?php echo CHtml::error($this, "[$id]operation");?>
+        </div>
 
-        echo '<div class="large-5 column"> ';
-        $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
-            'name' => 'diagnosis',
-            'model' => $this,
-            'attribute' => "[$id]textValue",
-            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonDiagnoses'),
-            'options' => array(
-                'minLength' => 2,
-            ),
-        ), true);
-        Yii::app()->clientScript->render($html);
-        echo $html;
-        echo CHtml::error($this, "[$id]textValue");
-        echo '</div>';
+        <div class="large-3 column">
+            <?php
+            $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
+                'name' => 'diagnosis',
+                'model' => $this,
+                'attribute' => "[$id]textValue",
+                'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonDiagnoses'),
+                'options' => array(
+                    'minLength' => 2,
+                ),
+            ), true);
+            Yii::app()->clientScript->render($html);
+            echo $html;
+            echo CHtml::error($this, "[$id]textValue"); ?>
+        </div>
+        <div class="large-2 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]isConfirmed", $diagOptions, array('empty' => 'Any'));?>
+        </div>
+        <?php
     }
 
     /**
@@ -84,29 +98,31 @@ class PatientDiagnosisParameter extends CaseSearchParameter
         // Construct your SQL query here.
         if ($searchProvider->getProviderID()  === 'mysql')
         {
+            $query = "SELECT p.id 
+FROM patient p 
+LEFT JOIN secondary_diagnosis sd 
+  ON sd.patient_id = p.id 
+LEFT JOIN disorder d 
+  ON d.id = sd.disorder_id 
+WHERE d.term LIKE :p_d_value_$this->id
+  AND (:p_d_confirmed_$this->id = '' OR (:p_d_confirmed_$this->id = " . self::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR :p_d_confirmed_$this->id = sd.is_confirmed)";
             switch ($this->operation)
             {
-                case '=':
-                    $op = '=';
+                case 'LIKE':
+                    // Do nothing extra.
                     break;
-                case '!=':
-                    $op = '!=';
-                    break;
-                case 'contains':
-                    $op = 'LIKE';
+                case 'NOT LIKE':
+                    $query = "SELECT p.id 
+FROM patient p
+WHERE p.id NOT IN (
+  $query
+)";
                     break;
                 default:
                     throw new CHttpException(400, 'Invalid operator specified.');
                     break;
             }
-
-            return "SELECT p.id 
-FROM patient p 
-JOIN secondary_diagnosis sd 
-  ON sd.patient_id = p.id 
-JOIN disorder d 
-  ON d.id = sd.disorder_id 
-WHERE d.term $op :p_d_value_$this->id";
+            return $query;
         }
         else
         {
@@ -122,7 +138,8 @@ WHERE d.term $op :p_d_value_$this->id";
     {
         // Construct your list of bind values here. Use the format ":bind" => "value".
         return array(
-            "p_d_value_$this->id" => $this->textValue,
+            "p_d_value_$this->id" => '%' . $this->textValue . '%',
+            "p_d_confirmed_$this->id" => $this->isConfirmed,
         );
     }
 

@@ -72,7 +72,7 @@ abstract class CaseSearchParameter extends CFormModel
     /**
      * Generate a SQL fragment representing a JOIN condition to a subquery.
      * @param $joinAlias string The alias of the table being joined to.
-     * @param $criteria string An array of join conditions. The ID for each element is the column name from the aliased table.
+     * @param $criteria array An array of join conditions. The ID for each element is the column name from the aliased table.
      * @param $searchProvider SearchProvider search provider. This is used for an internal query invocation for subqueries.
      * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
      */

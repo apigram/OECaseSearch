@@ -115,44 +115,48 @@ class PatientAgeParameter extends CaseSearchParameter
             '!=' => 'Is not',
             'BETWEEN' => 'Between'
         );
-        echo '<div class="large-2 column">';
-        echo CHtml::label($this->getKey(), false);
-        echo '</div>';
-        echo '<div class="large-3 column">';
-        echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('onchange' => 'refreshValues(this)', 'prompt' => 'Select One...'));
-        echo CHtml::error($this, "[$id]operation");
-        echo '</div>';
+        ?>
+        <div class="large-2 column">
+            <?php echo CHtml::label($this->getKey(), false); ?>
+        </div>
+        <div class="large-3 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('onchange' => 'refreshValues(this)', 'prompt' => 'Select One...')); ?>
+            <?php echo CHtml::error($this, "[$id]operation"); ?>
+        </div>
 
-        if ($this->operation === 'BETWEEN') {
-            echo '<div class="dual-value large-3 column" style="display: inline-block;"> ';
-            echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min'));
-            echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max'));
-            echo CHtml::error($this, "[$id]minValue");
-            echo CHtml::error($this, "[$id]maxValue");
-            echo '</div> ';
-            echo '<div class="single-value large-3 column" style="display: none;"> ';
-            echo CHtml::activeTextField($this, "[$id]textValue");
-            echo CHtml::error($this, "[$id]textValue");
-            echo '</div>';
-        }
-        else
-        {
-            echo '<div class="dual-value large-3 column" style="display: none;"> ';
-            echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min'));
-            echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max'));
-            echo CHtml::error($this, "[$id]minValue");
-            echo CHtml::error($this, "[$id]maxValue");
-            echo '</div> ';
-            echo '<div class="single-value large-3 column"> ';
-            echo CHtml::activeTextField($this, "[$id]textValue");
-            echo CHtml::error($this, "[$id]textValue");
-            echo '</div>';
-            echo '<div class="large-2 column">';
-            echo CHtml::label('years of age', false);
-            echo '</div>';
-        }
+        <?php if ($this->operation === 'BETWEEN'): ?>
 
-        echo CHtml::activeHiddenField($this, "[$id]id");
+        <div class="dual-value large-3 column" style="display: inline-block;">
+            <?php echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min')); ?>
+            <?php echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max')); ?>
+            <?php echo CHtml::error($this, "[$id]minValue"); ?>
+            <?php echo CHtml::error($this, "[$id]maxValue"); ?>
+        </div>
+        <div class="single-value large-3 column" style="display: none;">
+            <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
+            <?php echo CHtml::error($this, "[$id]textValue"); ?>
+        </div>
+
+        <?php else: ?>
+
+        <div class="dual-value large-3 column" style="display: none;">
+            <?php echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min')); ?>
+            <?php echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max')); ?>
+            <?php echo CHtml::error($this, "[$id]minValue"); ?>
+            <?php echo CHtml::error($this, "[$id]maxValue"); ?>
+        </div>
+        <div class="single-value large-3 column">
+            <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
+            <?php echo CHtml::error($this, "[$id]textValue"); ?>
+        </div>
+            <?php echo '<div class="large-2 column">'; ?>
+            <?php echo CHtml::label('years of age', false); ?>
+        </div>
+
+        <?php endif; ?>
+
+        <?php echo CHtml::activeHiddenField($this, "[$id]id");?>
+        <?php
     }
 
     /**

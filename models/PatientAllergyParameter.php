@@ -51,34 +51,38 @@ class PatientAllergyParameter extends CaseSearchParameter
             '=' => 'Is allergic to',
             '!=' => 'Is not allergic to'
         );
+        ?>
 
-        echo '<div class="large-2 column">';
-        echo CHtml::label($this->getKey(), false);
-        echo '</div>';
-        echo '<div class="large-3 column">';
-        echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
-        echo CHtml::error($this, "[$id]operation");
-        echo '</div>';
+        <div class="large-2 column">
+            <?php echo CHtml::label($this->getKey(), false); ?>
+        </div>
+        <div class="large-3 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
+            <?php echo CHtml::error($this, "[$id]operation"); ?>
+        </div>
 
-        echo '<div class="large-5 column"> ';
-        $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
-            'name' => 'allergy',
-            'model' => $this,
-            'attribute' => "[$id]textValue",
-            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonAllergies'),
-            'options' => array(
-                'minLength' => 2,
-            ),
-        ), true);
-        Yii::app()->clientScript->render($html);
-        echo $html;
-        echo CHtml::error($this, "[$id]textValue");
-        echo '</div>';
+        <div class="large-5 column">
+            <?php
+            $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
+                'name' => 'allergy',
+                'model' => $this,
+                'attribute' => "[$id]textValue",
+                'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonAllergies'),
+                'options' => array(
+                    'minLength' => 2,
+                ),
+            ), true);
+            Yii::app()->clientScript->render($html);
+            echo $html;
+            ?>
+            <?php echo CHtml::error($this, "[$id]textValue"); ?>
+        </div>
+        <?php
     }
 
     /**
     * Generate a SQL fragment representing the subquery of a FROM condition.
-    * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+    * @param $searchProvider SearchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
     * @return mixed The constructed query string.
      * @throws CHttpException
     */

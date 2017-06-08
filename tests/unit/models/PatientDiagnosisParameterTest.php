@@ -48,8 +48,16 @@ LEFT JOIN secondary_diagnosis sd
   ON sd.patient_id = p.id 
 LEFT JOIN disorder d 
   ON d.id = sd.disorder_id 
-WHERE d.term $operator :p_d_value_0
+WHERE d.term LIKE :p_d_value_0
   AND (:p_d_confirmed_0 = '' OR (:p_d_confirmed_0 = " . PatientDiagnosisParameter::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR :p_d_confirmed_0 = sd.is_confirmed)";
+            if ($operator === 'NOT LIKE')
+            {
+                $sqlValue = "SELECT p.id 
+FROM patient p
+WHERE p.id NOT IN (
+  $sqlValue
+)";
+            }
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
 

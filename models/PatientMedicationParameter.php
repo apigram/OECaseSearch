@@ -49,33 +49,35 @@ class PatientMedicationParameter extends CaseSearchParameter
         // Place screen-rendering code here.
         $ops = array(
             'LIKE' => 'Has taken ',
-            'UNLIKE' => 'Has not taken',
+            'NOT LIKE' => 'Has not taken',
         );
+        ?>
 
-        echo '<div class="large-2 column">';
-        echo CHtml::label($this->getKey(), false);
-        echo '</div>';
-        echo '<div class="large-3 column">';
-        echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
-        echo CHtml::error($this, "[$id]operation");
-        echo '</div>';
+        <div class="large-2 column">
+            <?php echo CHtml::label($this->getKey(), false); ?>
+        </div>
+        <div class="large-3 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
+            <?php echo CHtml::error($this, "[$id]operation"); ?>
+        </div>
 
-        echo '<div class="large-5 column"> ';
-        $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
-            'name' => 'medication',
-            'model' => $this,
-            'attribute' => "[$id]textValue",
-            'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonMedicines'),
-            'options' => array(
-                'minLength' => 2,
-            ),
-        ), true);
-        Yii::app()->clientScript->render($html);
-        echo $html;
-        echo CHtml::error($this, "[$id]textValue");
-        echo '</div>';
-
-        echo CHtml::activeHiddenField($this, "[$id]id");
+        <div class="large-5 column">
+            <?php
+            $html = Yii::app()->controller->widget('zii.widgets.jui.CJuiAutoComplete', array(
+                'name' => 'medication',
+                'model' => $this,
+                'attribute' => "[$id]textValue",
+                'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonMedicines'),
+                'options' => array(
+                    'minLength' => 2,
+                ),
+            ), true);
+            Yii::app()->clientScript->render($html);
+            echo $html;
+            ?>
+            <?php echo CHtml::error($this, "[$id]textValue"); ?>
+        </div>
+        <?php
     }
 
     /**
@@ -96,7 +98,7 @@ class PatientMedicationParameter extends CaseSearchParameter
                     $op = 'LIKE';
                     $wildcard = '%';
                     break;
-                case 'UNLIKE':
+                case 'NOT LIKE':
                     $op = 'NOT LIKE';
                     $wildcard = '%';
                     break;

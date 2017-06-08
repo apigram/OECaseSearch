@@ -79,7 +79,8 @@ class PatientDiagnosisParameter extends CaseSearchParameter
             ), true);
             Yii::app()->clientScript->render($html);
             echo $html;
-            echo CHtml::error($this, "[$id]textValue"); ?>
+            ?>
+            <?php echo CHtml::error($this, "[$id]textValue"); ?>
         </div>
         <div class="large-2 column">
             <?php echo CHtml::activeDropDownList($this, "[$id]isConfirmed", $diagOptions, array('empty' => 'Any'));?>

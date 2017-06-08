@@ -88,26 +88,29 @@ class FamilyHistoryParameter extends CaseSearchParameter
         }
         // Place screen-rendering code here.
 
-        echo '<div class="large-2 column">';
-        echo CHtml::label($this->getKey(), false);
-        echo '</div>';
+        ?>
+        <div class="large-2 column">
+            <?php echo CHtml::label($this->getKey(), false); ?>
+        </div>
 
-        echo '<div class="large-2 column">';
-        echo CHtml::activeDropDownList($this, "[$id]side", $sides, array('empty' => 'Any side'));
-        echo '</div>';
-        
-        echo '<div class="large-2 column">';
-        echo CHtml::activeDropDownList($this, "[$id]relative", $relatives, array('empty' => 'Any relative'));
-        echo '</div>';
+        <div class="large-2 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]side", $sides, array('empty' => 'Any side')); ?>
+        </div>
 
-        echo '<div class="large-2 column">';
-        echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
-        echo CHtml::error($this, "[$id]operation");
-        echo '</div>';
-        echo '<div class="large-2 column">';
-        echo CHtml::activeDropDownList($this, "[$id]condition", $conditions, array('prompt' => 'Select One...'));
-        echo CHtml::error($this, "[$id]condition");
-        echo '</div>';
+        <div class="large-2 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]relative", $relatives, array('empty' => 'Any relative')); ?>
+        </div>
+
+        <div class="large-2 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
+            <?php echo CHtml::error($this, "[$id]operation"); ?>
+        </div>
+        <div class="large-2 column">';
+            <?php echo CHtml::activeDropDownList($this, "[$id]condition", $conditions, array('prompt' => 'Select One...')); ?>
+            <?php echo CHtml::error($this, "[$id]condition"); ?>
+        </div>
+
+        <?php
     }
 
     /**

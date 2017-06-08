@@ -45,7 +45,6 @@ class PreviousTrialParameter extends CaseSearchParameter
 
     public function renderParameter($id)
     {
-        // Place screen-rendering code here.
         $ops = array(
             '=' => 'Has been in trial',
             '!=' => 'Has never been in trial'
@@ -56,18 +55,20 @@ class PreviousTrialParameter extends CaseSearchParameter
         foreach ($trialModels as $trial) {
             $trials[$trial->id] = "$trial->name - $trial->description";
         }
+        ?>
 
-        echo '<div class="large-2 column">';
-        echo CHtml::label($this->getKey(), false);
-        echo '</div>';
-        echo '<div class="large-3 column">';
-        echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...'));
-        echo CHtml::error($this, "[$id]operation");
-        echo '</div>';
+        <div class="large-2 column">
+            <?php echo CHtml::label($this->getKey(), false); ?>
+        </div>';
+        <div class="large-3 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
+            <?php echo CHtml::error($this, "[$id]operation"); ?>
+        </div>';
 
-        echo '<div class="large-5 column"> ';
-        echo CHtml::activeDropDownList($this, "[$id]trial", $trials, array('empty' => 'Any'));
-        echo '</div>';
+        <div class="large-5 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]trial", $trials, array('empty' => 'Any')); ?>
+        </div>
+        <?php
     }
 
     /**

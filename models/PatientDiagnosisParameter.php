@@ -54,11 +54,11 @@ class PatientDiagnosisParameter extends CaseSearchParameter
         );
 
         $diagOptions = array(
-            self::DIAGNOSIS_UNCONFIRMED => 'Unconfirmed',
-            self::DIAGNOSIS_CONFIRMED => 'Confirmed'
+            self::DIAGNOSIS_UNCONFIRMED => 'Unconfirmed only',
+            self::DIAGNOSIS_CONFIRMED => 'Confirmed only'
         );
         ?>
-        <div class="large-2 column">
+        <div class="large-1 column">
             <?php echo CHtml::label($this->getKey(), false); ?>
         </div>
         <div class="large-3 column">
@@ -82,8 +82,8 @@ class PatientDiagnosisParameter extends CaseSearchParameter
             ?>
             <?php echo CHtml::error($this, "[$id]textValue"); ?>
         </div>
-        <div class="large-2 column">
-            <?php echo CHtml::activeDropDownList($this, "[$id]isConfirmed", $diagOptions, array('empty' => 'Any'));?>
+        <div class="large-3 column">
+            <?php echo CHtml::activeDropDownList($this, "[$id]isConfirmed", $diagOptions, array('empty' => 'Confirmed/Unconfirmed'));?>
         </div>
         <?php
     }

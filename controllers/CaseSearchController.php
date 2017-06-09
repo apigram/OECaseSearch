@@ -33,6 +33,7 @@ class CaseSearchController extends BaseModuleController
     {
         $valid = true;
         $parameters = array();
+        $fixedParameters = $this->module->getFixedParams();
         $ids = array();
         if (isset($_SESSION['last_search'])) {
             $ids = $_SESSION['last_search'];
@@ -44,6 +45,7 @@ class CaseSearchController extends BaseModuleController
         }
 
         $criteria = new CDbCriteria();
+
         foreach ($this->module->parameters as $parameter) {
             $paramName = $parameter . 'Parameter';
             if (isset($_POST[$paramName])) {
@@ -57,11 +59,22 @@ class CaseSearchController extends BaseModuleController
                 }
             }
         }
+
+        foreach ($fixedParameters as $parameter) {
+            if (isset($_POST[get_class($parameter)])) {
+                $parameter->attributes = $_POST[get_class($parameter)];
+                if (!$parameter->validate()) {
+                    $valid = false;
+                }
+            }
+        }
+
         // This should only run if there are parameters and if all parameters are valid
         if (!empty($parameters) and $valid) {
+            $mergedParams = array_merge($parameters, $fixedParameters);
             $this->actionClear();
             $searchProvider = $this->module->getSearchProvider('mysql');
-            $results = $searchProvider->search($parameters);
+            $results = $searchProvider->search($mergedParams);
 
             $ids = array();
 
@@ -88,12 +101,15 @@ class CaseSearchController extends BaseModuleController
             ),
         ));
 
+        // remove any fixed parameters from the parameter list.
+
         // Get the list of parameter types for display on-screen.
         $paramList = $this->module->getParamList();
 
         $this->render('index', array(
             'paramList' => $paramList,
             'params' => $parameters,
+            'fixedParams' => $fixedParameters,
             'patients' => $patientData,
         ));
     }

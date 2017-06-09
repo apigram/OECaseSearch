@@ -33,7 +33,7 @@ class PatientMedicationParameterTest extends CTestCase
 
         $correctOps = array(
             'LIKE',
-            'UNLIKE',
+            'NOT LIKE',
         );
         $invalidOps = array(
             '=',
@@ -42,7 +42,6 @@ class PatientMedicationParameterTest extends CTestCase
         // Ensure the query is correct for each operator.
         foreach ($correctOps as $operator) {
             $this->object->operation = $operator;
-            $op = ($operator === 'UNLIKE' ? 'NOT LIKE' : 'LIKE');
             $wildcard = '%';
             $sqlValue = "
 SELECT p.id 
@@ -53,8 +52,8 @@ LEFT JOIN drug d
   ON d.id = m.drug_id
 LEFT JOIN medication_drug md
   ON md.id = m.medication_drug_id
-WHERE d.name $op '$wildcard' || :p_m_value_0 || '$wildcard'
-  OR md.name $op '$wildcard' || :p_m_value_0 || '$wildcard'";
+WHERE d.name $operator '$wildcard' || :p_m_value_0 || '$wildcard'
+  OR md.name $operator '$wildcard' || :p_m_value_0 || '$wildcard'";
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
 

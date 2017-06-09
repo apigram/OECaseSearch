@@ -12,6 +12,11 @@ class OECaseSearchModule extends CWebModule
     public $parameters = array();
 
     /**
+     * @var array A list of parameter classes that will always appear on the case search screen.
+     */
+    public $fixedParameters = array();
+
+    /**
      * @var array A List of search providers that can be used for searching. These are specified in the format ['providerID' => 'className'].
      */
     public $providers = array();
@@ -37,6 +42,9 @@ class OECaseSearchModule extends CWebModule
 
     }
 
+    /**
+     * @return string The assets path URL for this module's assets.
+     */
     public function getAssetsUrl()
     {
         if ($this->_assetsUrl === null)
@@ -44,6 +52,23 @@ class OECaseSearchModule extends CWebModule
             $this->_assetsUrl = Yii::app()->assetManager->publish(Yii::getPathOfAlias('application.modules.OECaseSearch.assets'));
         }
         return $this->_assetsUrl;
+    }
+
+    /**
+     * @return array The list of fixed parameter class instances configured for the case search module.
+     */
+    public function getFixedParams()
+    {
+        $fixedParams = array();
+        foreach ($this->fixedParameters as $parameter)
+        {
+            $className = $parameter . 'Parameter';
+            $obj = new $className;
+            $obj->id = $obj->alias();
+            $fixedParams[$obj->id] = $obj;
+        }
+
+        return $fixedParams;
     }
 
     /**
@@ -63,8 +88,8 @@ class OECaseSearchModule extends CWebModule
     }
 
     /**
-     * @param $providerID The unique ID of the search provider you wish to use. This can be found in config/common.php for each included search provider.
-     * @return mixed
+     * @param $providerID mixed The unique ID of the search provider you wish to use. This can be found in config/common.php for each included search provider.
+     * @return SearchProvider The search provider identified by $providerID
      */
     public function getSearchProvider($providerID)
     {

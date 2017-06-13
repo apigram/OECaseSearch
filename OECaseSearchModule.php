@@ -1,31 +1,15 @@
 <?php
 
-/**
- * Class OECaseSearchModule
- * When adding this module to the application, parameter classes are specified as XXYY (Parameter is automatically appended eg. PatientAge becomes PatientAgeParameter).
- */
 class OECaseSearchModule extends CWebModule
 {
-    /**
-     * @var array A list of parameter classes that can be selected on the Case Search screen.
-     */
-    public $parameters = array();
-
-    /**
-     * @var array A list of parameter classes that will always appear on the case search screen.
-     */
-    public $fixedParameters = array();
-
-    /**
-     * @var array A List of search providers that can be used for searching. These are specified in the format ['providerID' => 'className'].
-     */
-    public $providers = array();
     private $searchProviders = array();
     private $_assetsUrl;
+    private $config;
 
     public function init()
     {
         // import the module-level models and components
+        $this->config = Yii::app()->params['OECaseSearch'];
         $trialModule = array('OETrial.models.*');
         $this->setImport(array_merge(array(
                 'OECaseSearch.models.*',
@@ -35,11 +19,10 @@ class OECaseSearchModule extends CWebModule
         );
 
         // Initialise the search provider/s.
-        foreach ($this->providers as $providerID => $searchProvider)
+        foreach ($this->config['providers'] as $providerID => $searchProvider)
         {
             $this->searchProviders[$providerID] = new $searchProvider($providerID);
         }
-
     }
 
     /**
@@ -60,7 +43,7 @@ class OECaseSearchModule extends CWebModule
     public function getFixedParams()
     {
         $fixedParams = array();
-        foreach ($this->fixedParameters as $parameter)
+        foreach ($this->config['fixedParameters'] as $parameter)
         {
             $className = $parameter . 'Parameter';
             $obj = new $className;
@@ -77,7 +60,7 @@ class OECaseSearchModule extends CWebModule
     public function getParamList()
     {
         $keys = array();
-        foreach ($this->parameters as $parameter)
+        foreach ($this->config['parameters'] as $parameter)
         {
             $className = $parameter . 'Parameter';
             $obj = new $className;
@@ -85,6 +68,15 @@ class OECaseSearchModule extends CWebModule
         }
 
         return $keys;
+    }
+
+    /**
+     * @param $param mixed The key of the respective config parameter for OECaseSearch.
+     * @return mixed The config parameter value
+     */
+    public function getConfigParam($param)
+    {
+        return $this->config[$param];
     }
 
     /**

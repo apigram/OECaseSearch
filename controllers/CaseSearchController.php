@@ -46,7 +46,7 @@ class CaseSearchController extends BaseModuleController
 
         $criteria = new CDbCriteria();
 
-        foreach ($this->module->parameters as $parameter) {
+        foreach ($this->module->getConfigParam('parameters') as $parameter) {
             $paramName = $parameter . 'Parameter';
             if (isset($_POST[$paramName])) {
                 foreach ($_POST[$paramName] as $id => $param) {
@@ -100,8 +100,6 @@ class CaseSearchController extends BaseModuleController
                 'pageSize' => 10
             ),
         ));
-
-        // remove any fixed parameters from the parameter list.
 
         // Get the list of parameter types for display on-screen.
         $paramList = $this->module->getParamList();

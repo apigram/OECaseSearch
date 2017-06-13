@@ -1,10 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: andre
- * Date: 23/05/2017
- * Time: 2:14 PM
+/* @var $data Patient
+ *
  */
+
 ?>
 
 <div class="result box generic">
@@ -36,20 +34,18 @@
                 )
             );
 
-            if ($inOtherTrials): ?>
-                Already in another Trial
-            <?php else: ?>
-                <a id="add-to-trial-link-<?php echo $data->id; ?>"
-                   href="javascript:void(0)" <?php echo $inTrial ? 'style="display:none"' : ''; ?>
-                   onclick="addPatientToTrial(<?php echo $data->id; ?>, <?php echo $this->trialContext->id; ?>)">
-                    Add to Trial
-                </a>
-                <a id="remove-from-trial-link-<?php echo $data->id; ?>"
-                   href="javascript:void(0)" <?php echo !$inTrial ? 'style="display:none"' : ''; ?>
-                   onclick="removePatientFromTrial(<?php echo $data->id; ?>, <?php echo $this->trialContext->id; ?>)">
-                    Remove from Trial
-                </a>
-            <?php endif;
+            ?>
+            <a id="add-to-trial-link-<?php echo $data->id; ?>"
+               href="javascript:void(0)" <?php echo $inTrial ? 'style="display:none"' : ''; ?>
+               onclick="addPatientToTrial(<?php echo $data->id; ?>, <?php echo $this->trialContext->id; ?>)">
+                Add to Trial
+            </a>
+            <a id="remove-from-trial-link-<?php echo $data->id; ?>"
+               href="javascript:void(0)" <?php echo !$inTrial ? 'style="display:none"' : ''; ?>
+               onclick="removePatientFromTrial(<?php echo $data->id; ?>, <?php echo $this->trialContext->id; ?>)">
+                Remove from Trial
+            </a>
+            <?php
         }
     } ?>
 

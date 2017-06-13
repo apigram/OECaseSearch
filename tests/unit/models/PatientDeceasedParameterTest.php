@@ -23,17 +23,18 @@ class PatientDeceasedParameterTest extends CTestCase
     public function testQuery()
     {
         $correctOps = array(
-            0,
-            1
+            '1',
+            '0'
         );
         $invalidOps = array(
-            'LIKE'
+            'LIKE',
+            'NOT LIKE'
         );
 
         // Ensure the query is correct for each operator.
         foreach ($correctOps as $operator) {
             $this->parameter->operation = $operator;
-            $sqlValue = ($operator === 0) ? "SELECT id FROM patient WHERE NOT(is_deceased)" : "SELECT id FROM patient";
+            $sqlValue = ($operator === '0') ? "SELECT id FROM patient WHERE NOT(is_deceased)" : "SELECT id FROM patient";
             $this->assertEquals($sqlValue, $this->parameter->query($this->searchProvider));
         }
 
@@ -50,7 +51,7 @@ class PatientDeceasedParameterTest extends CTestCase
      */
     public function testBindValues()
     {
-        $this->parameter->operation = 1;
+        $this->parameter->operation = '1';
         $expected = array();
 
         // Ensure that all bind values are returned.
@@ -72,7 +73,7 @@ class PatientDeceasedParameterTest extends CTestCase
      */
     public function testJoin()
     {
-        $this->parameter->operation = 0;
+        $this->parameter->operation = '0';
         $innerSql = $this->parameter->query($this->searchProvider);
 
         // Ensure that the JOIN string is correct.

@@ -10,7 +10,7 @@ class PatientDeceasedParameter extends CaseSearchParameter
     {
         parent::__construct($scenario);
         $this->name = 'patient_deceased';
-        $this->operation = 0;
+        $this->operation = false;
     }
 
     public function getKey()
@@ -63,14 +63,14 @@ class PatientDeceasedParameter extends CaseSearchParameter
     {
         // Construct your SQL query here.
         if ($searchProvider->getProviderID() === 'mysql') {
-            if ($this->operation == 1) {
+            if ($this->operation === '1') {
                 // Return all patients.
                 return "SELECT id FROM patient";
-            } elseif ($this->operation == 0) {
+            } elseif ($this->operation === '0') {
                 // Return only non-deceased patients.
                 return "SELECT id FROM patient WHERE NOT(is_deceased)";
             } else {
-                throw new CHttpException(400, 'Invalid value specified');
+                throw new CHttpException(400, "Invalid value specified: $this->operation");
             }
         } else {
             return null;

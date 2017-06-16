@@ -10,11 +10,13 @@ class PreviousTrialParameterTest extends CTestCase
 {
     protected $object;
     protected $searchProvider;
+    protected $invalidProvider;
 
     protected function setUp()
     {
         $this->object = new PreviousTrialParameter();
         $this->searchProvider = new DBProvider('mysql');
+        $this->invalidProvider = new DBProvider('invalid');
         $this->object->id = 0;
     }
 
@@ -22,6 +24,7 @@ class PreviousTrialParameterTest extends CTestCase
     {
         unset($this->object); // start from scratch for each test.
         unset($this->searchProvider);
+        unset($this->invalidProvider);
     }
 
     /**
@@ -97,6 +100,8 @@ WHERE $condition";
                 }
             }
         }
+
+        $this->assertNull($this->object->query($this->invalidProvider));
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
         $this->setExpectedException(CHttpException::class);

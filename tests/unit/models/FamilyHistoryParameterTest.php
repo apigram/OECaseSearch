@@ -10,6 +10,7 @@ class FamilyHistoryParameterTest extends CTestCase
 {
     protected $object;
     protected $searchProvider;
+    protected $invalidProvider;
 
     public static function setupBeforeClass()
     {
@@ -20,6 +21,7 @@ class FamilyHistoryParameterTest extends CTestCase
     {
         $this->object = new FamilyHistoryParameter();
         $this->searchProvider = new DBProvider('mysql');
+        $this->invalidProvider = new DBProvider('invalid');
         $this->object->id = 0;
     }
 
@@ -27,6 +29,7 @@ class FamilyHistoryParameterTest extends CTestCase
     {
         unset($this->object); // start from scratch for each test.
         unset($this->searchProvider);
+        unset($this->invalidProvider);
     }
 
     /**
@@ -55,6 +58,7 @@ WHERE (:f_h_side_0 IS NULL OR fh.side_id = :f_h_side_0)
   AND (:f_h_condition_0 $operator :f_h_condition_0)";
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
+        $this->assertNull($this->object->query($this->invalidProvider));
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
         $this->setExpectedException(CHttpException::class);

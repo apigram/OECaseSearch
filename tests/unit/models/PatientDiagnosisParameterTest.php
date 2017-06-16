@@ -10,11 +10,13 @@ class PatientDiagnosisParameterTest extends CTestCase
 {
     protected $object;
     protected $searchProvider;
+    protected $invalidProvider;
 
     protected function setUp()
     {
         $this->object = new PatientDiagnosisParameter();
         $this->searchProvider = new DBProvider('mysql');
+        $this->invalidProvider = new DBProvider('invalid');
         $this->object->id = 0;
     }
 
@@ -22,6 +24,7 @@ class PatientDiagnosisParameterTest extends CTestCase
     {
         unset($this->object); // start from scratch for each test.
         unset($this->searchProvider);
+        unset($this->invalidProvider);
     }
 
     /**
@@ -60,6 +63,7 @@ WHERE p.id NOT IN (
             }
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
+        $this->assertNull($this->object->query($this->invalidProvider));
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
         $this->setExpectedException(CHttpException::class);

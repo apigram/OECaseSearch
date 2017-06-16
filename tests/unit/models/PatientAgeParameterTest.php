@@ -13,15 +13,21 @@ class PatientAgeParameterTest extends CTestCase
         Yii::app()->getModule('OECaseSearch');
     }
     protected $parameter;
+    protected $searchProvider;
+    protected $invalidProvider;
     protected function setUp()
     {
         $this->parameter = new PatientAgeParameter();
+        $this->searchProvider = new DBProvider('mysql');
+        $this->invalidProvider = new DBProvider('invalid');
         $this->parameter->id = 0;
     }
 
     protected function tearDown()
     {
-        unset($this->parameter);
+        unset($this->parameter); // start from scratch for each test.
+        unset($this->searchProvider);
+        unset($this->invalidProvider);
     }
 
     /**
@@ -32,8 +38,6 @@ class PatientAgeParameterTest extends CTestCase
         $this->parameter->textValue = 5;
         $this->parameter->minValue = 5;
         $this->parameter->maxValue = 80;
-
-        $searchProvider = new DBProvider('mysql');
         $correctOps = array(
             '<',
             '>',
@@ -57,14 +61,15 @@ class PatientAgeParameterTest extends CTestCase
             else {
                 $sqlValue = "SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE())) $operator :p_a_min_0 AND :p_a_max_0";
             }
-            $this->assertEquals($sqlValue, $this->parameter->query($searchProvider));
+            $this->assertEquals($sqlValue, $this->parameter->query($this->searchProvider));
         }
+        $this->assertNull($this->parameter->query($this->invalidProvider));
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
         $this->setExpectedException(CHttpException::class);
         foreach ($invalidOps as $operator) {
             $this->parameter->operation = $operator;
-            $this->parameter->query($searchProvider);
+            $this->parameter->query($this->searchProvider);
         }
     }
 
@@ -106,12 +111,11 @@ class PatientAgeParameterTest extends CTestCase
      */
     public function testJoin()
     {
-        $searchProvider = new DBProvider('mysql');
         $this->parameter->operation = '=';
-        $innerSql = $this->parameter->query($searchProvider);
+        $innerSql = $this->parameter->query($this->searchProvider);
 
         // Ensure that the JOIN string is correct.
         $expected = " JOIN ($innerSql) p_a_0 ON p_a_1.id = p_a_0.id";
-        $this->assertEquals($expected, $this->parameter->join('p_a_1', array('id' => 'id'), $searchProvider));
+        $this->assertEquals($expected, $this->parameter->join('p_a_1', array('id' => 'id'), $this->searchProvider));
     }
 }

@@ -37,24 +37,65 @@ class PreviousTrialParameterTest extends CTestCase
             'NOT LIKE',
         );
 
+        $types = array(
+            Trial::TRIAL_TYPE_NON_INTERVENTION,
+            Trial::TRIAL_TYPE_INTERVENTION,
+            '',
+        );
+
+        $trials = array(
+            1,
+            ''
+        );
+
         // Ensure the query is correct for each operator and returns a set of results.
         foreach ($correctOps as $operator) {
             $this->object->operation = $operator;
-            if ($operator === '=') {
-                $joinCondition = 'JOIN';
-                $condition = ":p_t_trial_0 = '' OR t_p.trial_id = :p_t_trial_0";
-            }
-            else if ($operator === '!=') {
-                $joinCondition = 'LEFT JOIN';
-                $condition = "(:p_t_trial_0 = '' AND t_p.trial_id IS NULL) OR (t_p.trial_id IS NULL OR t_p.trial_id != :p_t_trial_0)";
-            }
-            $sqlValue = "
+            foreach ($types as $type) {
+                $this->object->type = $type;
+                foreach ($trials as $trial) {
+                    $this->object->trial = $trial;
+                    if ($operator === '=') {
+                        $joinCondition = 'JOIN';
+                        if ($this->object->type !== '' and isset($this->object->type)) {
+                            if ($this->object->trial === '') {
+                                // Any intervention/non-intervention trial
+                                $condition = "t.trial_type = :p_t_type_0";
+                            } else {
+                                // specific trial
+                                $condition = "t_p.trial_id = :p_t_trial_0";
+                            }
+
+                        } else {
+                            // Any trial
+                            $condition = "t_p.trial_id IS NOT NULL";
+                        }
+                    } elseif ($operator === '!=') {
+                        $joinCondition = 'LEFT JOIN';
+                        if ($this->object->type !== '' and isset($this->object->type)) {
+                            if ($this->object->trial === '') {
+                                // Not in any intervention/non-intervention trial
+                                $condition = "t_p.trial_id IS NULL OR t.trial_type != :p_t_type_0";
+                            } else {
+                                // Not in a specific trial
+                                $condition = "t_p.trial_id IS NULL OR t_p.trial_id != :p_t_trial_0";
+                            }
+                        } else {
+                            // not in any trial
+                            $condition = "t_p.trial_id IS NULL";
+                        }
+                    }
+                    $sqlValue = "
 SELECT p.id 
 FROM patient p 
 $joinCondition trial_patient t_p 
   ON t_p.patient_id = p.id 
+$joinCondition trial t
+  ON t.id = t_p.trial_id
 WHERE $condition";
-            $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
+                    $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
+                }
+            }
         }
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
@@ -71,12 +112,31 @@ WHERE $condition";
     public function testBindValues()
     {
         $this->object->trial = 1;
+        $this->object->type = Trial::TRIAL_TYPE_INTERVENTION;
         $expected = array(
-            'p_t_trial_0' => $this->object->trial,
+            ':p_t_trial_0' => $this->object->trial,
         );
 
         // Ensure that all bind values are returned.
         $this->assertEquals($expected, $this->object->bindValues());
+
+        $this->object->trial = '';
+
+        $expected = array(
+            ':p_t_type_0' => $this->object->type,
+        );
+
+        $this->assertEquals($expected, $this->object->bindValues());
+
+        $this->object->trial = 1;
+
+        // Both binds should never be returned. Only one should be returned.
+        $incorrect = array(
+            ':p_t_type_0' => $this->object->type,
+            ':p_t_trial_0' => $this->object->trial
+        );
+
+        $this->assertNotEquals($incorrect, $this->object->bindValues());
     }
 
     /**

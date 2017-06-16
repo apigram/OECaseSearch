@@ -11,7 +11,7 @@ $this->pageTitle = 'OpenEyes - Case Search'
 <h1 class="badge"><?php echo $this->trialContext == null ? 'Case Search' : 'Add Patients to Trial'; ?></h1>
 
 <div class="row">
-  <div class="large-8 column">
+  <div class="large-10 column">
     <div class="form">
         <?php $form = $this->beginWidget('CActiveForm', array(
             'id' => 'search-form',

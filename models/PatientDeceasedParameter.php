@@ -62,7 +62,7 @@ class PatientDeceasedParameter extends CaseSearchParameter
     public function query($searchProvider)
     {
         // Construct your SQL query here.
-        if ($searchProvider->getProviderID() === 'mysql') {
+        if ($searchProvider->providerID === 'mysql') {
             if ($this->operation === '1') {
                 // Return all patients.
                 return "SELECT id FROM patient";

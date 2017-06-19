@@ -69,23 +69,9 @@ class FamilyHistoryParameter extends CaseSearchParameter
         $sideList = FamilyHistorySide::model()->findAll();
         $conditionList = FamilyHistoryCondition::model()->findAll();
 
-        $relatives = array();
-        $sides = array();
-        $conditions = array();
-
-        foreach ($relativeList as $relative) {
-            $relatives[$relative->id] = $relative->name;
-        }
-
-        foreach ($sideList as $side) {
-            if ($side !== 'N/A') {
-                $sides[$side->id] = $side->name;
-            }
-        }
-
-        foreach ($conditionList as $condition) {
-            $conditions[$condition->id] = $condition->name;
-        }
+        $relatives = CHtml::listData($relativeList, 'id', 'name');
+        $sides = CHtml::listData($sideList, 'id', 'name');
+        $conditions = CHtml::listData($conditionList, 'id', 'name');
         // Place screen-rendering code here.
 
         ?>
@@ -105,7 +91,7 @@ class FamilyHistoryParameter extends CaseSearchParameter
             <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
             <?php echo CHtml::error($this, "[$id]operation"); ?>
         </div>
-        <div class="large-2 column">';
+        <div class="large-2 column">
             <?php echo CHtml::activeDropDownList($this, "[$id]condition", $conditions, array('prompt' => 'Select One...')); ?>
             <?php echo CHtml::error($this, "[$id]condition"); ?>
         </div>
@@ -122,7 +108,7 @@ class FamilyHistoryParameter extends CaseSearchParameter
     public function query($searchProvider)
     {
         // Construct your SQL query here.
-        if ($searchProvider->getProviderID()  === 'mysql')
+        if ($searchProvider->providerID === 'mysql')
         {
             switch ($this->operation)
             {
@@ -169,7 +155,7 @@ WHERE (:f_h_side_$this->id IS NULL OR fh.side_id = :f_h_side_$this->id)
     /**
     * Generate a SQL fragment representing a JOIN condition to a subquery.
     * @param $joinAlias string The alias of the table being joined to.
-    * @param $criteria string An array of join conditions. The ID for each element is the column name from the aliased table.
+    * @param $criteria array An array of join conditions. The ID for each element is the column name from the aliased table.
     * @param $searchProvider SearchProvider The search provider. This is used for an internal query invocation for subqueries.
     * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
     */

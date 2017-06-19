@@ -67,7 +67,7 @@ class PatientMedicationParameter extends CaseSearchParameter
                 'name' => 'medication',
                 'model' => $this,
                 'attribute' => "[$id]textValue",
-                'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonMedicines'),
+                'source' => Yii::app()->controller->createUrl('AutoComplete/commonMedicines'),
                 'options' => array(
                     'minLength' => 2,
                 ),
@@ -82,14 +82,14 @@ class PatientMedicationParameter extends CaseSearchParameter
 
     /**
     * Generate a SQL fragment representing the subquery of a FROM condition.
-    * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+    * @param $searchProvider SearchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
     * @return mixed The constructed query string.
-     * @throws CHttpException
+    * @throws CHttpException
     */
     public function query($searchProvider)
     {
         // Construct your SQL query here.
-        if ($searchProvider->getProviderID()  === 'mysql')
+        if ($searchProvider->providerID  === 'mysql')
         {
             $wildcard = ''; // This will only be set for 'contains' operations. Other operations will not use wildcards so they are left blank.
             switch ($this->operation)
@@ -97,20 +97,10 @@ class PatientMedicationParameter extends CaseSearchParameter
                 case 'LIKE':
                     $op = 'LIKE';
                     $wildcard = '%';
-                    break;
-                case 'NOT LIKE':
-                    $op = 'NOT LIKE';
-                    $wildcard = '%';
-                    break;
-                default:
-                    throw new CHttpException(400, 'Invalid operator specified.');
-                    break;
-            }
-
-            return "
+                    return "
 SELECT p.id 
 FROM patient p 
-JOIN medication m 
+LEFT JOIN medication m 
   ON m.patient_id = p.id 
 LEFT JOIN drug d 
   ON d.id = m.drug_id
@@ -118,6 +108,27 @@ LEFT JOIN medication_drug md
   ON md.id = m.medication_drug_id
 WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
   OR md.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'";
+                    break;
+                case 'NOT LIKE':
+                    $op = 'NOT LIKE';
+                    $wildcard = '%';
+                    return "
+SELECT p.id 
+FROM patient p 
+LEFT JOIN medication m 
+  ON m.patient_id = p.id 
+LEFT JOIN drug d 
+  ON d.id = m.drug_id
+LEFT JOIN medication_drug md
+  ON md.id = m.medication_drug_id
+WHERE d.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
+  OR md.name $op '$wildcard' || :p_m_value_$this->id || '$wildcard'
+  OR m.id IS NULL";
+                    break;
+                default:
+                    throw new CHttpException(400, 'Invalid operator specified.');
+                    break;
+            }
         }
         else
         {

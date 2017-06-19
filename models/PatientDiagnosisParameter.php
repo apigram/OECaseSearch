@@ -72,7 +72,7 @@ class PatientDiagnosisParameter extends CaseSearchParameter
                 'name' => 'diagnosis',
                 'model' => $this,
                 'attribute' => "[$id]textValue",
-                'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonDiagnoses'),
+                'source' => Yii::app()->controller->createUrl('AutoComplete/commonDiagnoses'),
                 'options' => array(
                     'minLength' => 2,
                 ),
@@ -90,14 +90,14 @@ class PatientDiagnosisParameter extends CaseSearchParameter
 
     /**
      * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+     * @param $searchProvider SearchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
      * @return mixed The constructed query string.
      * @throws CHttpException
      */
     public function query($searchProvider)
     {
         // Construct your SQL query here.
-        if ($searchProvider->getProviderID()  === 'mysql')
+        if ($searchProvider->providerID  === 'mysql')
         {
             $query = "SELECT p.id 
 FROM patient p 
@@ -146,9 +146,9 @@ WHERE p.id NOT IN (
 
     /**
     * Generate a SQL fragment representing a JOIN condition to a subquery.
-    * @param $joinAlias The alias of the table being joined to.
-    * @param $criteria An array of join conditions. The ID for each element is the column name from the aliased table.
-    * @param $searchProvider The search provider. This is used for an internal query invocation for subqueries.
+    * @param $joinAlias string The alias of the table being joined to.
+    * @param $criteria array An array of join conditions. The ID for each element is the column name from the aliased table.
+    * @param $searchProvider SearchProvider The search provider. This is used for an internal query invocation for subqueries.
     * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
     */
     public function join($joinAlias, $criteria, $searchProvider)

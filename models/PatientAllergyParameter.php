@@ -67,7 +67,7 @@ class PatientAllergyParameter extends CaseSearchParameter
                 'name' => 'allergy',
                 'model' => $this,
                 'attribute' => "[$id]textValue",
-                'source' => Yii::app()->urlManager->createUrl('OECaseSearch/AutoComplete/commonAllergies'),
+                'source' => Yii::app()->controller->createUrl('AutoComplete/commonAllergies'),
                 'options' => array(
                     'minLength' => 2,
                 ),
@@ -89,7 +89,7 @@ class PatientAllergyParameter extends CaseSearchParameter
     public function query($searchProvider)
     {
         // Construct your SQL query here.
-        if ($searchProvider->getProviderID()  === 'mysql')
+        if ($searchProvider->providerID === 'mysql')
         {
             switch ($this->operation)
             {
@@ -133,9 +133,9 @@ WHERE a.name $op :p_al_textValue_$this->id";
 
     /**
     * Generate a SQL fragment representing a JOIN condition to a subquery.
-    * @param $joinAlias The alias of the table being joined to.
-    * @param $criteria An array of join conditions. The ID for each element is the column name from the aliased table.
-    * @param $searchProvider The search provider. This is used for an internal query invocation for subqueries.
+    * @param $joinAlias string The alias of the table being joined to.
+    * @param $criteria array An array of join conditions. The ID for each element is the column name from the aliased table.
+    * @param $searchProvider SearchProvider The search provider. This is used for an internal query invocation for subqueries.
     * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
     */
     public function join($joinAlias, $criteria, $searchProvider)

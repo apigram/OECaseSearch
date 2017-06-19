@@ -5,7 +5,10 @@
  */
 abstract class SearchProvider
 {
-    private $providerID;
+    /**
+     * @var mixed Unique provider ID
+     */
+    protected $_providerID;
 
     /**
      * SearchProvider constructor.
@@ -13,26 +16,36 @@ abstract class SearchProvider
      */
     public function __construct($id)
     {
-        $this->providerID = $id;
+        $this->_providerID = $id;
     }
 
     /**
-     * Perform a search using the specified parameters.
+     * Magic get method to get the provider ID without a getter while also preventing setting it directly.
+     * @param $name string The property name
+     * @return null|mixed The value of the given property (if it exists).
+     */
+    public final function __get($name)
+    {
+        if ($name === 'providerID')
+        {
+            return $this->_providerID;
+        }
+        $trace = debug_backtrace();
+        trigger_error('Undefined property via __get(): ' . $name .
+        ' in ' . $trace[0]['file'] .
+        ' on line '. $trace[0]['line'],
+            E_USER_NOTICE);
+        return null;
+    }
+
+    /**
+     * Perform a search using the specified parameters. Call this function to run the search rather than executeSearch.
      * @param $parameters array A list of CaseSearchParameter objects representing a search parameter.
      * @return mixed Search results. This will take whatever form is specified within the subclass' executeSearch implementation.
      */
     public final function search($parameters)
     {
         return $this->executeSearch($parameters);
-    }
-
-    /**
-     * Get the search provider's unique ID.
-     * @return mixed The search provider's unique ID.
-     */
-    public final function getProviderID()
-    {
-        return $this->providerID;
     }
 
     /**

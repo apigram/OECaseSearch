@@ -8,6 +8,9 @@
  */
 class DBProviderTest extends CDbTestCase
 {
+    /**
+     * @var DBProvider search provider.
+     */
     protected $provider;
 
     public static function setupBeforeClass()
@@ -27,8 +30,9 @@ class DBProviderTest extends CDbTestCase
 
     /**
      * @covers DBProvider::executeSearch()
+     * @covers DBProvider::search()
      */
-    public function testExecuteSearch()
+    public function testSearch()
     {
         // executeSearch is a protected function so it needs to be run via DBProvider's parent function, search.
         $testParameter1 = new PatientAgeParameter();
@@ -44,5 +48,19 @@ class DBProviderTest extends CDbTestCase
         $results = $this->provider->search(array($testParameter1, $testParameter2));
 
         $this->assertNotEmpty($results);
+    }
+
+    public function testMagicMethods()
+    {
+        // Ensure that the provider ID can be retrieved by simply referring to it.
+        $this->assertEquals('mysql', $this->provider->providerID);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Notice
+     */
+    public function testMagicMethodException()
+    {
+        $value = $this->provider->fakeProp;
     }
 }

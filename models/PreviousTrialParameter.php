@@ -101,7 +101,7 @@ class PreviousTrialParameter extends CaseSearchParameter
     public function query($searchProvider)
     {
         // Construct your SQL query here.
-        if ($searchProvider->getProviderID() === 'mysql') {
+        if ($searchProvider->providerID === 'mysql') {
             switch ($this->operation) {
                 case '=':
                     $joinCondition = 'JOIN';

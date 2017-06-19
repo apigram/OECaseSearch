@@ -47,19 +47,32 @@ class AutoCompleteController extends BaseModuleController
      */
     public function actionCommonMedicines($term)
     {
-        $medicines = Medication::model()->findAllBySql("
-SELECT m.*
-FROM medication m 
-LEFT JOIN drug d 
-  ON d.id = m.drug_id 
-LEFT JOIN medication_drug md
-  ON md.id = m.medication_drug_id
-WHERE LCASE(d.name) LIKE LCASE(:term) OR LCASE(md.name) LIKE LCASE(:term) ORDER BY d.name, md.name LIMIT 30", array('term' => "%$term%"));
+        $drugs = Drug::model()->findAllBySql("
+SELECT *
+FROM drug d 
+WHERE LCASE(d.name) LIKE LCASE(:term) ORDER BY d.name LIMIT 30", array('term' => "$term%"));
+
+        $medicationDrugs = MedicationDrug::model()->findAllBySql("
+SELECT *
+FROM medication_drug md
+WHERE LCASE(md.name) LIKE LCASE(:term) ORDER BY md.name LIMIT 30", array('term' => "$term%"));
+
         $values = array();
-        foreach ($medicines as $medicine)
+        foreach ($drugs as $drug)
         {
-            $values[] = $medicine->getDrugLabel();
+            $values[$drug->name] = $drug->name;
         }
+
+        foreach ($medicationDrugs as $medicationDrug)
+        {
+            // Filter out any duplicates.
+            if (!isset($values[$medicationDrug->name]))
+            {
+                $values[$medicationDrug->name] = $medicationDrug->name;
+            }
+        }
+
+        sort($values);
 
         echo CJSON::encode($values);
     }

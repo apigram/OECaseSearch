@@ -167,7 +167,7 @@ class PatientAgeParameter extends CaseSearchParameter
      */
     public function query($searchProvider)
     {
-        if ($searchProvider->getProviderID()  === 'mysql')
+        if ($searchProvider->providerID  === 'mysql')
         {
             switch ($this->operation)
             {
@@ -247,7 +247,7 @@ class PatientAgeParameter extends CaseSearchParameter
 
     /**
      * @param $joinAlias string Alias of the table.
-     * @param $criteria string Criteria used for JOINs.
+     * @param $criteria array Criteria used for JOINs.
      * @param $searchProvider SearchProvider The search provider constructing the JOIN SQL statement.
      * @return string The constructed SQL JOIN statement.
      */

@@ -46,10 +46,13 @@ class PatientMedicationParameterTest extends CTestCase
         foreach ($correctOps as $operator) {
             $this->object->operation = $operator;
             $wildcard = '%';
-            $sqlValue = "
+
+            if ($operator === 'LIKE')
+            {
+                $sqlValue = "
 SELECT p.id 
 FROM patient p 
-JOIN medication m 
+LEFT JOIN medication m 
   ON m.patient_id = p.id 
 LEFT JOIN drug d 
   ON d.id = m.drug_id
@@ -57,6 +60,22 @@ LEFT JOIN medication_drug md
   ON md.id = m.medication_drug_id
 WHERE d.name $operator '$wildcard' || :p_m_value_0 || '$wildcard'
   OR md.name $operator '$wildcard' || :p_m_value_0 || '$wildcard'";
+            }
+            elseif ($operator === 'NOT LIKE')
+            {
+                $sqlValue = "
+SELECT p.id 
+FROM patient p 
+LEFT JOIN medication m 
+  ON m.patient_id = p.id 
+LEFT JOIN drug d 
+  ON d.id = m.drug_id
+LEFT JOIN medication_drug md
+  ON md.id = m.medication_drug_id
+WHERE d.name $operator '$wildcard' || :p_m_value_0 || '$wildcard'
+  OR md.name $operator '$wildcard' || :p_m_value_0 || '$wildcard'
+  OR m.id IS NULL";
+            }
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
 

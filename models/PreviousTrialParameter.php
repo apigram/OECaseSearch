@@ -69,22 +69,25 @@ class PreviousTrialParameter extends CaseSearchParameter
               array('empty' => 'Any Trial', 'onchange' => 'getTrialList(this)')); ?>
       </div>
 
+      <div class="large-3 column trial-list">
+        <p></p>
+      </div>
+
       <script type="text/javascript">
         function getTrialList(target) {
           var type = parseInt($(target).val());
           var trialHtml = null;
-          $(target).parent().parent().find('.trial-list').remove();
 
           if (type === <?php echo Trial::TRIAL_TYPE_INTERVENTION; ?>) {
             trialHtml = <?php echo $this->getInterventionTrialList($this->id); ?>;
-            $(target).parent().parent().find('.trial-type').after(trialHtml);
+            $(target).parent().parent().find('.trial-list').replaceWith(trialHtml);
           }
           else if (type === <?php echo Trial::TRIAL_TYPE_NON_INTERVENTION; ?>) {
             trialHtml = <?php echo $this->getNonInterventionTrialList($this->id); ?>;
-            $(target).parent().parent().find('.trial-type').after(trialHtml);
+            $(target).parent().parent().find('.trial-list').replaceWith(trialHtml);
           }
           else {
-            $(target).parent().parent().find('.trial-list').remove();
+            $(target).parent().parent().find('.trial-list').replaceWith('<div class="large-3 column trial-list"><p></p></div>');
           }
         }
       </script>

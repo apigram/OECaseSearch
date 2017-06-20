@@ -90,7 +90,9 @@ class CaseSearchController extends BaseModuleController
         }
 
         // If there are no IDs found, pass -1 as the value (as this will not match with anything).
-        $criteria->compare('id', empty($ids) ? -1 : $ids);
+        $criteria->compare('t.id', empty($ids) ? -1 : $ids);
+        $criteria->with = 'contact';
+        $criteria->order = 'last_name, first_name';
 
         // A data provider is used here to allow faster search times. Results are iterated through using the data provider's pagination functionality and the CListView widget's pager.
         $patientData = new CActiveDataProvider('Patient', array(

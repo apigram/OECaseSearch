@@ -48,8 +48,8 @@ class PreviousTrialParameter extends CaseSearchParameter
     public function renderParameter($id)
     {
         $ops = array(
-            '=' => 'Has been in trial',
-            '!=' => 'Has never been in trial',
+            '=' => 'Has been in',
+            '!=' => 'Has never been in',
         );
 
         $types = Trial::getTrialTypeOptions();

@@ -164,9 +164,9 @@ WHERE $condition";
         // Construct your list of bind values here. Use the format "bind" => "value".
         $binds = array();
 
-        if ($this->trial !== '') {
+        if ($this->trial !== '' and isset($this->trial)) {
             $binds[":p_t_trial_$this->id"] = $this->trial;
-        } elseif ($this->type !== '') {
+        } elseif ($this->type !== '' and isset($this->type)) {
             $binds[":p_t_type_$this->id"] = $this->type;
         }
 

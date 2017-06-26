@@ -41,6 +41,7 @@ class PatientAgeParameter extends CaseSearchParameter
     {
         return array_merge(parent::rules(), array(
             array('textValue, minValue, maxValue', 'safe'),
+            array('textValue, minValue, maxValue', 'numerical', 'min' => 0),
             array('textValue, minValue, maxValue', 'values'),
         ));
     }
@@ -81,14 +82,14 @@ class PatientAgeParameter extends CaseSearchParameter
         $label = $this->attributeLabels()[$attribute];
         if ($attribute === 'minValue' or $attribute === 'maxValue')
         {
-            if ($this->operation === 'BETWEEN' and (empty($this->$attribute) or !isset($this->$attribute)))
+            if ($this->operation === 'BETWEEN' and strlen($this->$attribute) === 0)
             {
                 $this->addError($attribute, "$label must be specified.");
             }
         }
         else
         {
-            if ($this->operation !== 'BETWEEN' and (empty($this->$attribute) or !isset($this->$attribute)))
+            if ($this->operation !== 'BETWEEN' and strlen($this->$attribute) === 0)
             {
                 $this->addError($attribute, "$label must be specified.");
             }
@@ -149,13 +150,11 @@ class PatientAgeParameter extends CaseSearchParameter
             <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
             <?php echo CHtml::error($this, "[$id]textValue"); ?>
         </div>
-            <?php echo '<div class="large-2 column">'; ?>
-            <?php echo CHtml::label('years of age', false); ?>
+        <div class="large-2 column">
+            <p>years of age</p>
         </div>
 
         <?php endif; ?>
-
-        <?php echo CHtml::activeHiddenField($this, "[$id]id");?>
         <?php
     }
 
@@ -219,19 +218,19 @@ class PatientAgeParameter extends CaseSearchParameter
     public function bindValues()
     {
         $bindValues = array();
-        if (!empty($this->minValue))
+        if (strlen($this->minValue) !== 0)
         {
-            $bindValues["p_a_min_$this->id"] = $this->minValue;
+            $bindValues["p_a_min_$this->id"] = intval($this->minValue);
         }
 
-        if (!empty($this->maxValue))
+        if (strlen($this->maxValue) !== 0)
         {
-            $bindValues["p_a_max_$this->id"] = $this->maxValue;
+            $bindValues["p_a_max_$this->id"] = intval($this->maxValue);
         }
 
-        if (!empty($this->textValue))
+        if (strlen($this->textValue) !== 0)
         {
-            $bindValues["p_a_value_$this->id"] = $this->textValue;
+            $bindValues["p_a_value_$this->id"] = intval($this->textValue);
         }
 
         return $bindValues;

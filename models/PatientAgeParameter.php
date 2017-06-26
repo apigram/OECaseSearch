@@ -82,14 +82,14 @@ class PatientAgeParameter extends CaseSearchParameter
         $label = $this->attributeLabels()[$attribute];
         if ($attribute === 'minValue' or $attribute === 'maxValue')
         {
-            if ($this->operation === 'BETWEEN' and ($this->$attribute === '' or !isset($this->$attribute)))
+            if ($this->operation === 'BETWEEN' and strlen($this->$attribute) === 0)
             {
                 $this->addError($attribute, "$label must be specified.");
             }
         }
         else
         {
-            if ($this->operation !== 'BETWEEN' and ($this->$attribute === '' or !isset($this->$attribute)))
+            if ($this->operation !== 'BETWEEN' and strlen($this->$attribute) === 0)
             {
                 $this->addError($attribute, "$label must be specified.");
             }
@@ -150,13 +150,11 @@ class PatientAgeParameter extends CaseSearchParameter
             <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
             <?php echo CHtml::error($this, "[$id]textValue"); ?>
         </div>
-            <?php echo '<div class="large-2 column">'; ?>
-            <?php echo CHtml::label('years of age', false); ?>
+        <div class="large-2 column">
+            <p>years of age</p>
         </div>
 
         <?php endif; ?>
-
-        <?php echo CHtml::activeHiddenField($this, "[$id]id");?>
         <?php
     }
 
@@ -220,17 +218,17 @@ class PatientAgeParameter extends CaseSearchParameter
     public function bindValues()
     {
         $bindValues = array();
-        if ($this->minValue !== '')
+        if (strlen($this->minValue) !== 0)
         {
             $bindValues["p_a_min_$this->id"] = intval($this->minValue);
         }
 
-        if ($this->maxValue !== '')
+        if (strlen($this->maxValue) !== 0)
         {
             $bindValues["p_a_max_$this->id"] = intval($this->maxValue);
         }
 
-        if ($this->textValue !== '')
+        if (strlen($this->textValue) !== 0)
         {
             $bindValues["p_a_value_$this->id"] = intval($this->textValue);
         }

@@ -6,14 +6,31 @@
  * Date: 31/05/2017
  * Time: 4:51 PM
  */
-class PatientAllergyParameterTest extends CTestCase
+class PatientAllergyParameterTest extends CDbTestCase
 {
+    /**
+     * @var PatientAllergyParameter
+     */
     protected $object;
+
+    /**
+     * @var SearchProvider
+     */
     protected $searchProvider;
+
+    /**
+     * @var SearchProvider
+     */
     protected $invalidProvider;
+    protected $fixtures = array(
+        'patient' => 'Patient',
+        'allergy' => 'Allergy',
+        'patient_allergy_assignment' => 'PatientAllergyAssignment'
+    );
 
     protected function setUp()
     {
+        parent::setUp();
         $this->object = new PatientAllergyParameter();
         $this->searchProvider = new DBProvider('mysql');
         $this->invalidProvider = new DBProvider('invalid');
@@ -22,6 +39,7 @@ class PatientAllergyParameterTest extends CTestCase
 
     protected function tearDown()
     {
+        parent::tearDown();
         unset($this->object); // start from scratch for each test.
         unset($this->searchProvider);
         unset($this->invalidProvider);
@@ -45,14 +63,22 @@ class PatientAllergyParameterTest extends CTestCase
         // Ensure the query is correct for each operator.
         foreach ($correctOps as $operator) {
             $this->object->operation = $operator;
+            if ($operator === '=')
+            {
+                $predicate = "a.name = :p_al_textValue_0";
+            }
+            elseif ($operator === '!=')
+            {
+                $predicate = "a.id IS NULL OR a.name != :p_al_textValue_0";
+            }
             $sqlValue = "
 SELECT p.id 
 FROM patient p 
-JOIN patient_allergy_assignment paa
+LEFT JOIN patient_allergy_assignment paa
   ON paa.patient_id = p.id
-JOIN allergy a
+LEFT JOIN allergy a
   ON a.id = paa.allergy_id
-WHERE a.name $operator :p_al_textValue_0";
+WHERE $predicate";
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
         $this->assertNull($this->object->query($this->invalidProvider));
@@ -100,5 +126,41 @@ WHERE a.name $operator :p_al_textValue_0";
         // Ensure that the JOIN string is correct.
         $expected = " JOIN ($innerSql) p_al_0 ON p_al_1.id = p_al_0.id";
         $this->assertEquals($expected, $this->object->join('p_al_1', array('id' => 'id'), $this->searchProvider));
+    }
+
+    public function testSearch()
+    {
+        $match = $this->patient('patient7');
+        $this->object->operation = '=';
+        $this->object->textValue = 'allergy 1';
+
+        $results = $this->searchProvider->search(array($this->object));
+        $ids = $results[0];
+
+        $patients = Patient::model()->findByPk($ids);
+
+        $this->assertEquals($match, $patients);
+
+        $this->object->operation = '!=';
+        $match = array();
+        for ($i = 1; $i < 10; $i++)
+        {
+            if ($i !== 7)
+            {
+                $match[] = $this->patient("patient$i");
+            }
+        }
+
+        $results = $this->searchProvider->search(array($this->object));
+        $ids = array();
+
+        foreach ($results as $result)
+        {
+            $ids[] = $result['id'];
+        }
+
+        $patients = Patient::model()->findAllByPk($ids);
+
+        $this->assertEquals($match, $patients);
     }
 }

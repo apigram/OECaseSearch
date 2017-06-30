@@ -94,10 +94,10 @@ class PatientAllergyParameter extends CaseSearchParameter
             switch ($this->operation)
             {
                 case '=':
-                    $op = '=';
+                    $predicate = "a.name = :p_al_textValue_$this->id";
                     break;
                 case '!=':
-                    $op = '!=';
+                    $predicate = "a.id IS NULL OR a.name != :p_al_textValue_$this->id";
                     break;
                 default:
                     throw new CHttpException(400, 'Invalid operator specified.');
@@ -107,11 +107,11 @@ class PatientAllergyParameter extends CaseSearchParameter
             return "
 SELECT p.id 
 FROM patient p 
-JOIN patient_allergy_assignment paa
+LEFT JOIN patient_allergy_assignment paa
   ON paa.patient_id = p.id
-JOIN allergy a
+LEFT JOIN allergy a
   ON a.id = paa.allergy_id
-WHERE a.name $op :p_al_textValue_$this->id";
+WHERE $predicate";
         }
         else
         {

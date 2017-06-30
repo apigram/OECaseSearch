@@ -105,8 +105,15 @@ LEFT JOIN secondary_diagnosis sd
   ON sd.patient_id = p.id 
 LEFT JOIN disorder d 
   ON d.id = sd.disorder_id 
-WHERE d.term LIKE :p_d_value_$this->id
-  AND (:p_d_confirmed_$this->id = '' OR (:p_d_confirmed_$this->id = " . self::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR :p_d_confirmed_$this->id = sd.is_confirmed)";
+WHERE d.term LIKE :p_d_value_$this->id";
+            if ($this->isConfirmed === '0')
+            {
+                $query .= " AND sd.is_confirmed = :p_d_confirmed_$this->id";
+            }
+            elseif ($this->isConfirmed === '1')
+            {
+                $query .= " AND (:p_d_confirmed_$this->id = " . self::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR sd.is_confirmed = :p_d_confirmed_$this->id";
+            }
             switch ($this->operation)
             {
                 case 'LIKE':
@@ -138,9 +145,16 @@ WHERE p.id NOT IN (
     public function bindValues()
     {
         // Construct your list of bind values here. Use the format ":bind" => "value".
+        if ($this->isConfirmed !== '')
+        {
+            return array(
+                "p_d_value_$this->id" => '%' . $this->textValue . '%',
+                "p_d_confirmed_$this->id" => $this->isConfirmed,
+            );
+        }
+
         return array(
             "p_d_value_$this->id" => '%' . $this->textValue . '%',
-            "p_d_confirmed_$this->id" => $this->isConfirmed,
         );
     }
 

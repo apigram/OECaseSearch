@@ -6,7 +6,7 @@
  * Date: 22/05/2017
  * Time: 1:42 PM
  */
-class PatientAgeParameter extends CaseSearchParameter
+class PatientAgeParameter extends CaseSearchParameter implements DBProviderInterface
 {
     /**
      * @var integer Represents a single value

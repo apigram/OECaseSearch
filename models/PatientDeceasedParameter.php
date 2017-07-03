@@ -1,6 +1,6 @@
 <?php
 
-class PatientDeceasedParameter extends CaseSearchParameter
+class PatientDeceasedParameter extends CaseSearchParameter implements DBProviderInterface
 {
     /**
      * CaseSearchParameter constructor. This overrides the parent constructor so that the name can be immediately set.

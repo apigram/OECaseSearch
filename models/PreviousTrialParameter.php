@@ -1,6 +1,6 @@
 <?php
 
-class PreviousTrialParameter extends CaseSearchParameter
+class PreviousTrialParameter extends CaseSearchParameter implements DBProviderInterface
 {
     public $trial;
     public $type;

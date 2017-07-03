@@ -9,7 +9,7 @@
 class DBProvider extends SearchProvider
 {
     /**
-     * @param array $criteria The parameters to search with.
+     * @param array $criteria The parameters to search with. The parameters must implement the DBProviderInterface interface.
      * @return array The returned data from the search.
      */
     protected function executeSearch($criteria)

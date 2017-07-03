@@ -60,25 +60,26 @@ class PatientAllergyParameterTest extends CDbTestCase
             'NOT LIKE',
         );
 
-        // Ensure the query is correct for each operator.
-        foreach ($correctOps as $operator) {
-            $this->object->operation = $operator;
-            if ($operator === '=')
-            {
-                $predicate = "a.name = :p_al_textValue_0";
-            }
-            elseif ($operator === '!=')
-            {
-                $predicate = "a.id IS NULL OR a.name != :p_al_textValue_0";
-            }
-            $sqlValue = "
-SELECT p.id 
+        $sqlValue = "SELECT DISTINCT p.id 
 FROM patient p 
 LEFT JOIN patient_allergy_assignment paa
   ON paa.patient_id = p.id
 LEFT JOIN allergy a
   ON a.id = paa.allergy_id
-WHERE $predicate";
+WHERE a.name = :p_al_textValue_0";
+
+        // Ensure the query is correct for each operator.
+        foreach ($correctOps as $operator) {
+            $this->object->operation = $operator;
+            if ($operator === '!=')
+            {
+                $sqlValue = "SELECT DISTINCT p1.id
+FROM patient p1
+WHERE p1.id NOT IN (
+  $sqlValue
+)";
+            }
+
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
         $this->assertNull($this->object->query($this->invalidProvider));
@@ -142,14 +143,7 @@ WHERE $predicate";
         $this->assertEquals($match, $patients);
 
         $this->object->operation = '!=';
-        $match = array();
-        for ($i = 1; $i < 10; $i++)
-        {
-            if ($i !== 7)
-            {
-                $match[] = $this->patient("patient$i");
-            }
-        }
+        $match = Patient::model()->findAll('id!=?', array(7));
 
         $results = $this->searchProvider->search(array($this->object));
         $ids = array();

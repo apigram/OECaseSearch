@@ -66,7 +66,7 @@ LEFT JOIN secondary_diagnosis sd
   ON sd.patient_id = p.id 
 LEFT JOIN disorder d 
   ON d.id = sd.disorder_id 
-WHERE d.term LIKE :p_d_value_0";
+WHERE LOWER(d.term) LIKE LOWER(:p_d_value_0)";
                 if ($state === '0')
                 {
                     $sqlValue .= " AND sd.is_confirmed = :p_d_confirmed_0";
@@ -78,9 +78,9 @@ WHERE d.term LIKE :p_d_value_0";
 
                 if ($operator === 'NOT LIKE')
                 {
-                    $sqlValue = "SELECT p.id 
-FROM patient p
-WHERE p.id NOT IN (
+                    $sqlValue = "SELECT p1.id 
+FROM patient p1
+WHERE p1.id NOT IN (
   $sqlValue
 )";
                 }

@@ -146,12 +146,13 @@ class PatientAgeParameterTest extends CDbTestCase
      * @covers DBProvider::search()
      * @covers PatientAgeParameter::query()
      */
-    public function testSearch()
+    public function testSearchSingleInput()
     {
         // test an exact search using a simple operation
         $patients = array($this->patient('patient1'));
         $this->parameter->operation = '=';
-        $this->parameter->textValue = 47;
+        $dob = new DateTime($this->patient['patient1']['dob']);
+        $this->parameter->textValue = $dob->diff(new DateTime())->format('%y');
         $results = $this->searchProvider->search(array($this->parameter));
         $ids = array();
 
@@ -164,14 +165,22 @@ class PatientAgeParameterTest extends CDbTestCase
         // Ensure that results are returned.
         $this->assertEquals($patients, $patientList);
 
-        $this->parameter->textValue = null;
+        $this->parameter->operation = '=';
+        $this->parameter->textValue = 1;
+        $results = $this->searchProvider->search(array($this->parameter));
 
-        // test a full fixture search using the more complex BETWEEN operation.
+        // Ensure that no results are returned.
+        $this->assertEmpty($results);
+    }
+
+    public function testSearchDualInput()
+    {
+        $patients = array();
         $this->parameter->operation = 'BETWEEN';
         $this->parameter->minValue = 5;
         $this->parameter->maxValue = 80;
 
-        for ($i = 2; $i < 10; $i++)
+        for ($i = 1; $i < 10; $i++)
         {
             $patients[] = $this->patient("patient$i");
         }
@@ -188,14 +197,5 @@ class PatientAgeParameterTest extends CDbTestCase
 
         // Ensure that results are returned.
         $this->assertEquals($patients, $patientList);
-
-        $this->parameter->operation = '=';
-        $this->parameter->textValue = 1;
-        $this->parameter->minValue = null;
-        $this->parameter->maxValue = null;
-        $results = $this->searchProvider->search(array($this->parameter));
-
-        // Ensure that no results are returned.
-        $this->assertEmpty($results);
     }
 }

@@ -91,27 +91,30 @@ class PatientAllergyParameter extends CaseSearchParameter
         // Construct your SQL query here.
         if ($searchProvider->providerID === 'mysql')
         {
-            switch ($this->operation)
-            {
-                case '=':
-                    $predicate = "a.name = :p_al_textValue_$this->id";
-                    break;
-                case '!=':
-                    $predicate = "a.id IS NULL OR a.name != :p_al_textValue_$this->id";
-                    break;
-                default:
-                    throw new CHttpException(400, 'Invalid operator specified.');
-                    break;
-            }
-
-            return "
-SELECT p.id 
+            $query = "SELECT DISTINCT p.id 
 FROM patient p 
 LEFT JOIN patient_allergy_assignment paa
   ON paa.patient_id = p.id
 LEFT JOIN allergy a
   ON a.id = paa.allergy_id
-WHERE $predicate";
+WHERE a.name = :p_al_textValue_$this->id";
+            switch ($this->operation)
+            {
+                case '=':
+                    return $query;
+                    break;
+                case '!=':
+                    return "SELECT DISTINCT p1.id
+FROM patient p1
+WHERE p1.id NOT IN (
+  $query
+)";
+                    break;
+                default:
+                    throw new CHttpException(400, 'Invalid operator specified.');
+                    break;
+            }
+            return $query;
         }
         else
         {

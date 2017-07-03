@@ -9,14 +9,21 @@ class OECaseSearchModule extends CWebModule
     public function init()
     {
         // import the module-level models and components
-        $this->config = Yii::app()->params['OECaseSearch'];
-        $trialModule = array('OETrial.models.*');
-        $this->setImport(array_merge(array(
-                'OECaseSearch.models.*',
-                'OECaseSearch.components.*',
-            ),
-            isset(Yii::app()->modules['OETrial'])? $trialModule : null)
+        $this->config = Yii::app()->params['CaseSearch'];
+        $dependencies = array(
+            'OECaseSearch.models.*',
+            'OECaseSearch.components.*',
         );
+        foreach ($this->config['parameters'] as $module => $paramList)
+        {
+            if ($module !== 'core')
+            {
+                $dependencies = array_merge($dependencies, array(
+                    "$module.models.*",
+                ));
+            }
+        }
+        $this->setImport($dependencies);
 
         // Initialise the search provider/s.
         foreach ($this->config['providers'] as $providerID => $searchProvider)
@@ -43,14 +50,16 @@ class OECaseSearchModule extends CWebModule
     public function getFixedParams()
     {
         $fixedParams = array();
-        foreach ($this->config['fixedParameters'] as $parameter)
+        foreach ($this->config['fixedParameters'] as $group)
         {
-            $className = $parameter . 'Parameter';
-            $obj = new $className;
-            $obj->id = $obj->alias();
-            $fixedParams[$obj->id] = $obj;
+            foreach ($group as $parameter)
+            {
+                $className = $parameter . 'Parameter';
+                $obj = new $className;
+                $obj->id = 'fixed';
+                $fixedParams[$obj->alias()] = $obj;
+            }
         }
-
         return $fixedParams;
     }
 
@@ -60,11 +69,14 @@ class OECaseSearchModule extends CWebModule
     public function getParamList()
     {
         $keys = array();
-        foreach ($this->config['parameters'] as $parameter)
+        foreach ($this->config['parameters'] as $group)
         {
-            $className = $parameter . 'Parameter';
-            $obj = new $className;
-            $keys[$className] = $obj->getKey();
+            foreach ($group as $parameter)
+            {
+                $className = $parameter . 'Parameter';
+                $obj = new $className;
+                $keys[$className] = $obj->getKey();
+            }
         }
 
         return $keys;

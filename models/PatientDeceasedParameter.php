@@ -48,7 +48,7 @@ class PatientDeceasedParameter extends CaseSearchParameter implements DBProvider
           <?php echo CHtml::label('Include deceased patients', false); ?>
       </div>
       <div class="large-1 column end">
-          <?php echo CHtml::activeCheckBox($this, "operation"); ?>
+          <?php echo CHtml::activeCheckBox($this, "[$id]operation"); ?>
       </div>
         <?php
     }
@@ -120,6 +120,6 @@ class PatientDeceasedParameter extends CaseSearchParameter implements DBProvider
      */
     public function alias()
     {
-        return "p_de";
+        return "p_de_$this->id";
     }
 }

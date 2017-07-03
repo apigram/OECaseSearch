@@ -6,17 +6,35 @@
  * Date: 31/05/2017
  * Time: 3:39 PM
  */
-class PatientAgeParameterTest extends CTestCase
+class PatientAgeParameterTest extends CDbTestCase
 {
+    /**
+     * @var CaseSearchParameter
+     */
+    protected $parameter;
+
+    /**
+     * @var DBProvider
+     */
+    protected $searchProvider;
+
+    /**
+     * @var DBProvider
+     */
+    protected $invalidProvider;
+
+    protected $fixtures = array(
+        'patient' => 'Patient',
+    );
+
     public static function setupBeforeClass()
     {
         Yii::app()->getModule('OECaseSearch');
     }
-    protected $parameter;
-    protected $searchProvider;
-    protected $invalidProvider;
+
     protected function setUp()
     {
+        parent::setUp();
         $this->parameter = new PatientAgeParameter();
         $this->searchProvider = new DBProvider('mysql');
         $this->invalidProvider = new DBProvider('invalid');
@@ -25,6 +43,7 @@ class PatientAgeParameterTest extends CTestCase
 
     protected function tearDown()
     {
+        parent::tearDown();
         unset($this->parameter); // start from scratch for each test.
         unset($this->searchProvider);
         unset($this->invalidProvider);
@@ -86,8 +105,12 @@ class PatientAgeParameterTest extends CTestCase
             'p_a_min_0' => $this->parameter->minValue,
             'p_a_max_0' => $this->parameter->maxValue
         );
+        $actual = $this->parameter->bindValues();
         // Ensure that (if all elements are set) all bind values are returned.
-        $this->assertEquals($expected, $this->parameter->bindValues());
+        $this->assertEquals($expected, $actual);
+
+        // Ensure that all bind values are integers.
+        $this->assertTrue(is_int($actual['p_a_value_0']) and is_int($actual['p_a_min_0']) and is_int($actual['p_a_max_0']));
 
         // Ensure that only attributes with values are returned from the bindValues list.
         unset($expected['p_a_value_0']);
@@ -117,5 +140,62 @@ class PatientAgeParameterTest extends CTestCase
         // Ensure that the JOIN string is correct.
         $expected = " JOIN ($innerSql) p_a_0 ON p_a_1.id = p_a_0.id";
         $this->assertEquals($expected, $this->parameter->join('p_a_1', array('id' => 'id'), $this->searchProvider));
+    }
+
+    /**
+     * @covers DBProvider::search()
+     * @covers PatientAgeParameter::query()
+     */
+    public function testSearchSingleInput()
+    {
+        // test an exact search using a simple operation
+        $patients = array($this->patient('patient1'));
+        $this->parameter->operation = '=';
+        $dob = new DateTime($this->patient['patient1']['dob']);
+        $this->parameter->textValue = $dob->diff(new DateTime())->format('%y');
+        $results = $this->searchProvider->search(array($this->parameter));
+        $ids = array();
+
+        // deconstruct the results list into a single array of primary keys.
+        foreach ($results as $result) {
+            $ids[] = $result['id'];
+        }
+        $patientList = Patient::model()->findAllByPk($ids);
+
+        // Ensure that results are returned.
+        $this->assertEquals($patients, $patientList);
+
+        $this->parameter->operation = '=';
+        $this->parameter->textValue = 1;
+        $results = $this->searchProvider->search(array($this->parameter));
+
+        // Ensure that no results are returned.
+        $this->assertEmpty($results);
+    }
+
+    public function testSearchDualInput()
+    {
+        $patients = array();
+        $this->parameter->operation = 'BETWEEN';
+        $this->parameter->minValue = 5;
+        $this->parameter->maxValue = 80;
+
+        for ($i = 1; $i < 10; $i++)
+        {
+            $patients[] = $this->patient("patient$i");
+        }
+
+        $results = $this->searchProvider->search(array($this->parameter));
+
+        $ids = array();
+
+        // deconstruct the results list into a single array of primary keys.
+        foreach ($results as $result) {
+            $ids[] = $result['id'];
+        }
+        $patientList = Patient::model()->findAllByPk($ids);
+
+        // Ensure that results are returned.
+        $this->assertEquals($patients, $patientList);
     }
 }

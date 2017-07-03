@@ -6,11 +6,12 @@
  * Date: 31/05/2017
  * Time: 4:51 PM
  */
-class FamilyHistoryParameterTest extends CTestCase
+class FamilyHistoryParameterTest extends CDbTestCase
 {
     protected $object;
     protected $searchProvider;
     protected $invalidProvider;
+
 
     public static function setupBeforeClass()
     {
@@ -19,6 +20,7 @@ class FamilyHistoryParameterTest extends CTestCase
 
     protected function setUp()
     {
+        parent::setUp();
         $this->object = new FamilyHistoryParameter();
         $this->searchProvider = new DBProvider('mysql');
         $this->invalidProvider = new DBProvider('invalid');
@@ -27,6 +29,7 @@ class FamilyHistoryParameterTest extends CTestCase
 
     protected function tearDown()
     {
+        parent::tearDown();
         unset($this->object); // start from scratch for each test.
         unset($this->searchProvider);
         unset($this->invalidProvider);

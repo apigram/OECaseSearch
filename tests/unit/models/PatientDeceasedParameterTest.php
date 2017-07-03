@@ -1,12 +1,16 @@
 <?php
-class PatientDeceasedParameterTest extends CTestCase
+class PatientDeceasedParameterTest extends CDbTestCase
 {
     protected $parameter;
     protected $searchProvider;
     protected $invalidProvider;
+    protected $fixtures = array(
+        'patient' => 'Patient'
+    );
 
     protected function setUp()
     {
+        parent::setUp();
         $this->parameter = new PatientDeceasedParameter();
         $this->searchProvider = new DBProvider('mysql');
         $this->invalidProvider = new DBProvider('invalid');
@@ -15,6 +19,7 @@ class PatientDeceasedParameterTest extends CTestCase
 
     protected function tearDown()
     {
+        parent::tearDown();
         unset($this->parameter); // start from scratch for each test.
         unset($this->searchProvider);
         unset($this->invalidProvider);
@@ -83,5 +88,48 @@ class PatientDeceasedParameterTest extends CTestCase
         // Ensure that the JOIN string is correct.
         $expected = " JOIN ($innerSql) p_de ON p_a_0.id = p_de.id";
         $this->assertEquals($expected, $this->parameter->join('p_a_0', array('id' => 'id'), $this->searchProvider));
+    }
+
+    public function testSearch()
+    {
+        // Ensure all patient fixtures are returned.
+        $match = array();
+        for ($i = 1; $i < 10; $i++)
+        {
+            $match[] = $this->patient("patient$i");
+        }
+
+        $this->parameter->operation = '1';
+
+        $results = $this->searchProvider->search(array($this->parameter));
+
+        $ids = array();
+        foreach ($results as $result)
+        {
+            $ids[] = $result['id'];
+        }
+        $patients = Patient::model()->findAllByPk($ids);
+
+        $this->assertEquals($match, $patients);
+
+        // Ensure all patient fixtures except patient9 are returned.
+        $this->parameter->operation = '0';
+        $match = array();
+        for ($i = 1; $i < 9; $i++)
+        {
+            $match[] = $this->patient("patient$i");
+        }
+
+        $results = $this->searchProvider->search(array($this->parameter));
+
+        $ids = array();
+        foreach ($results as $result)
+        {
+            $ids[] = $result['id'];
+        }
+        $patients = Patient::model()->findAllByPk($ids);
+
+        $this->assertEquals($match, $patients);
+
     }
 }

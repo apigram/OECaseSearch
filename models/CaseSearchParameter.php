@@ -58,7 +58,7 @@ abstract class CaseSearchParameter extends CFormModel
 
     /**
      * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+     * @param $searchProvider SearchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
      * @return string The constructed query string.
      */
     abstract public function query($searchProvider);

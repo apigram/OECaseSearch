@@ -73,7 +73,7 @@ class PatientDeceasedParameterTest extends CDbTestCase
     public function testAlias()
     {
         // Ensure that the alias correctly utilises the ID.
-        $expected = 'p_de';
+        $expected = 'p_de_0';
         $this->assertEquals($expected, $this->parameter->alias());
     }
 
@@ -86,7 +86,7 @@ class PatientDeceasedParameterTest extends CDbTestCase
         $innerSql = $this->parameter->query($this->searchProvider);
 
         // Ensure that the JOIN string is correct.
-        $expected = " JOIN ($innerSql) p_de ON p_a_0.id = p_de.id";
+        $expected = " JOIN ($innerSql) p_de_0 ON p_a_0.id = p_de_0.id";
         $this->assertEquals($expected, $this->parameter->join('p_a_0', array('id' => 'id'), $this->searchProvider));
     }
 

@@ -1,5 +1,5 @@
 <?php
-class FamilyHistoryParameter extends CaseSearchParameter
+class FamilyHistoryParameter extends CaseSearchParameter implements DBProviderInterface
 {
     /**
      * @var $relative integer

@@ -1,6 +1,6 @@
 <?php
 
-class PatientDeceasedParameter extends CaseSearchParameter
+class PatientDeceasedParameter extends CaseSearchParameter implements DBProviderInterface
 {
     /**
      * CaseSearchParameter constructor. This overrides the parent constructor so that the name can be immediately set.
@@ -48,7 +48,7 @@ class PatientDeceasedParameter extends CaseSearchParameter
           <?php echo CHtml::label('Include deceased patients', false); ?>
       </div>
       <div class="large-1 column end">
-          <?php echo CHtml::activeCheckBox($this, "operation"); ?>
+          <?php echo CHtml::activeCheckBox($this, "[$id]operation"); ?>
       </div>
         <?php
     }
@@ -120,6 +120,6 @@ class PatientDeceasedParameter extends CaseSearchParameter
      */
     public function alias()
     {
-        return "p_de";
+        return "p_de_$this->id";
     }
 }

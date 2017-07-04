@@ -1,5 +1,5 @@
 <?php
-class PatientMedicationParameter extends CaseSearchParameter
+class PatientMedicationParameter extends CaseSearchParameter implements DBProviderInterface
 {
     public $textValue;
 

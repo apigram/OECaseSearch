@@ -46,25 +46,29 @@ class CaseSearchController extends BaseModuleController
 
         $criteria = new CDbCriteria();
 
-        foreach ($this->module->getConfigParam('parameters') as $parameter) {
-            $paramName = $parameter . 'Parameter';
-            if (isset($_POST[$paramName])) {
-                foreach ($_POST[$paramName] as $id => $param) {
-                    $newParam = new $paramName;
-                    $newParam->attributes = $_POST[$paramName][$id];
-                    if (!$newParam->validate()) {
-                        $valid = false;
+        foreach ($this->module->getConfigParam('parameters') as $group) {
+            foreach ($group as $parameter) {
+                $paramName = $parameter . 'Parameter';
+                if (isset($_POST[$paramName])) {
+                    foreach ($_POST[$paramName] as $id => $param) {
+                        $newParam = new $paramName;
+                        $newParam->attributes = $_POST[$paramName][$id];
+                        if (!$newParam->validate()) {
+                            $valid = false;
+                        }
+                        $parameters[$id] = $newParam;
                     }
-                    $parameters[$id] = $newParam;
                 }
             }
         }
 
         foreach ($fixedParameters as $parameter) {
             if (isset($_POST[get_class($parameter)])) {
-                $parameter->attributes = $_POST[get_class($parameter)];
-                if (!$parameter->validate()) {
-                    $valid = false;
+                foreach ($_POST[get_class($parameter)] as $id => $param) {
+                    $parameter->attributes = $_POST[get_class($parameter)][$id];
+                    if (!$parameter->validate()) {
+                        $valid = false;
+                    }
                 }
             }
         }
@@ -99,7 +103,7 @@ class CaseSearchController extends BaseModuleController
             'criteria' => $criteria,
             'totalItemCount' => count($ids),
             'pagination' => array(
-                'pageSize' => 10
+                'pageSize' => 10,
             ),
         ));
 

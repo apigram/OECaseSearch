@@ -1,5 +1,5 @@
 <?php
-class PatientDiagnosisParameter extends CaseSearchParameter
+class PatientDiagnosisParameter extends CaseSearchParameter implements DBProviderInterface
 {
     public $textValue;
     public $isConfirmed;

@@ -8,17 +8,20 @@
 
 return array(
     'params' => array(
-        'OECaseSearch' => array(
+        'CaseSearch' => array(
             'parameters' => array(
-                'PatientAge',
-                'PatientDiagnosis',
-                'PatientMedication',
-                'PreviousTrial',
-                'PatientAllergy',
-                'FamilyHistory',
+                'core' => array(
+                    'PatientAge',
+                    'PatientDiagnosis',
+                    'PatientMedication',
+                    'PatientAllergy',
+                    'FamilyHistory',
+                ),
             ),
             'fixedParameters' => array(
-                'PatientDeceased',
+                'core' => array(
+                    'PatientDeceased',
+                ),
             ),
             'providers' => array(
                 'mysql' => 'DBProvider',

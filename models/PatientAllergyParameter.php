@@ -1,5 +1,5 @@
 <?php
-class PatientAllergyParameter extends CaseSearchParameter
+class PatientAllergyParameter extends CaseSearchParameter implements DBProviderInterface
 {
     public $textValue;
 

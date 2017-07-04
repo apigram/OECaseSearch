@@ -13,10 +13,7 @@
           array('/patient/view', 'id' => $data->id), array('target' => '_blank')); ?></h3>
   <div class="row data-row">
     <div class="large-12 column">
-        <?php
-        $now = new DateTime();
-        echo $data->getGenderString() . ' ' . '(' . $now->diff(new DateTime($data->dob))->y . ')';
-        ?>
+        <?php echo "{$data->getGenderString()} ({$data->getAge()})"; ?>
     </div>
   </div>
     <?php if ($this->trialContext !== null &&

@@ -10,7 +10,9 @@ $this->pageTitle = 'OpenEyes - Case Search'
 ?>
 
 <div class="box admin">
-    <?php echo $this->trialContext == null ? 'Case Search' : '<h1>Adding Patients to Trial: ' . $this->trialContext->attributes['name'] . '</h1>'; ?>
+  <h1>
+      <?php echo $this->trialContext == null ? 'Case Search' : 'Adding Patients to Trial: ' . $this->trialContext->attributes['name']; ?>
+  </h1>
 </div>
 
 <div class="row">

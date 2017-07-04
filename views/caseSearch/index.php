@@ -8,7 +8,12 @@ $this->breadcrumbs = array(
 );
 $this->pageTitle = 'OpenEyes - Case Search'
 ?>
-<h1 class="badge"><?php echo $this->trialContext == null ? 'Case Search' : 'Add Patients to Trial'; ?></h1>
+
+<div class="box admin">
+  <h1>
+      <?php echo $this->trialContext == null ? 'Case Search' : 'Adding Patients to Trial: ' . $this->trialContext->name; ?>
+  </h1>
+</div>
 
 <div class="row">
   <div class="large-10 column">

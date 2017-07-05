@@ -16,11 +16,12 @@ class DBProvider extends SearchProvider
     {
         $lastID = -1;
         $bindValues = array();
+        $queryStr = null;
 
         // Construct the SQL search string using each parameter as a separate dataset merged using JOINs.
         foreach ($criteria as $id => $param)
         {
-            if (isset($queryStr))
+            if ($queryStr !== null)
             {
                 $queryStr .= $param->join($criteria[$lastID]->alias(), array('id' => 'id'), $this);
             }

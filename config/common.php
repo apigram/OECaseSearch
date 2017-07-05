@@ -16,6 +16,8 @@ return array(
                     'PatientMedication',
                     'PatientAllergy',
                     'FamilyHistory',
+                    'PatientName',
+                    'PatientNumber'
                 ),
             ),
             'fixedParameters' => array(

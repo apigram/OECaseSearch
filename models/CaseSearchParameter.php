@@ -27,7 +27,7 @@ abstract class CaseSearchParameter extends CFormModel
      * Get the parameter identifier (usually the name).
      * @return string The human-readable name of the parameter (for display purposes).
      */
-    abstract public function getKey();
+    abstract public function getLabel();
 
     /**
      * Override this function for any new attributes added to the subclass. Ensure that you invoke the parent function first to obtain and augment the initial list of attribute names.

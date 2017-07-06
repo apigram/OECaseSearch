@@ -75,7 +75,7 @@ class OECaseSearchModule extends CWebModule
             {
                 $className = $parameter . 'Parameter';
                 $obj = new $className;
-                $keys[$className] = $obj->getKey();
+                $keys[$className] = $obj->getLabel();
             }
         }
 

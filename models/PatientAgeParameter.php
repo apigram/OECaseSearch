@@ -40,7 +40,6 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
     public function rules()
     {
         return array_merge(parent::rules(), array(
-            array('textValue, minValue, maxValue', 'safe'),
             array('textValue, minValue, maxValue', 'numerical', 'min' => 0),
             array('textValue, minValue, maxValue', 'values'),
         ));
@@ -69,7 +68,7 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
             'textValue' => 'Value',
             'minValue' => 'Minimum Value',
             'maxValue' => 'Maximum Value',
-            'id' => 'ID'
+            'id' => 'ID',
         );
     }
 
@@ -80,17 +79,12 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
     public function values($attribute)
     {
         $label = $this->attributeLabels()[$attribute];
-        if ($attribute === 'minValue' or $attribute === 'maxValue')
-        {
-            if ($this->operation === 'BETWEEN' and strlen($this->$attribute) === 0)
-            {
+        if ($attribute === 'minValue' or $attribute === 'maxValue') {
+            if ($this->operation === 'BETWEEN' and strlen($this->$attribute) === 0) {
                 $this->addError($attribute, "$label must be specified.");
             }
-        }
-        else
-        {
-            if ($this->operation !== 'BETWEEN' and strlen($this->$attribute) === 0)
-            {
+        } else {
+            if ($this->operation !== 'BETWEEN' and strlen($this->$attribute) === 0) {
                 $this->addError($attribute, "$label must be specified.");
             }
         }
@@ -99,7 +93,7 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
     /**
      * @return string "Patient age".
      */
-    public function getKey()
+    public function getLabel()
     {
         return 'Patient Age';
     }
@@ -114,102 +108,91 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
             '>' => 'Older than',
             '=' => 'Is',
             '!=' => 'Is not',
-            'BETWEEN' => 'Between'
+            'BETWEEN' => 'Between',
         );
         ?>
-        <div class="large-2 column">
-            <?php echo CHtml::label($this->getKey(), false); ?>
-        </div>
-        <div class="large-3 column">
-            <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('onchange' => 'refreshValues(this)', 'prompt' => 'Select One...')); ?>
-            <?php echo CHtml::error($this, "[$id]operation"); ?>
-        </div>
+      <div class="large-2 column">
+          <?php echo CHtml::label($this->getLabel(), false); ?>
+      </div>
+      <div class="large-3 column">
+          <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops,
+              array('onchange' => 'refreshValues(this)', 'prompt' => 'Select One...')); ?>
+          <?php echo CHtml::error($this, "[$id]operation"); ?>
+      </div>
 
         <?php if ($this->operation === 'BETWEEN'): ?>
 
-        <div class="dual-value large-3 column" style="display: inline-block;">
-            <?php echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min')); ?>
-            <?php echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max')); ?>
-            <?php echo CHtml::error($this, "[$id]minValue"); ?>
-            <?php echo CHtml::error($this, "[$id]maxValue"); ?>
-        </div>
-        <div class="single-value large-3 column" style="display: none;">
-            <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
-            <?php echo CHtml::error($this, "[$id]textValue"); ?>
-        </div>
+      <div class="dual-value large-3 column" style="display: inline-block;">
+          <?php echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min')); ?>
+          <?php echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max')); ?>
+          <?php echo CHtml::error($this, "[$id]minValue"); ?>
+          <?php echo CHtml::error($this, "[$id]maxValue"); ?>
+      </div>
+      <div class="single-value large-3 column" style="display: none;">
+          <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
+          <?php echo CHtml::error($this, "[$id]textValue"); ?>
+      </div>
 
-        <?php else: ?>
+    <?php else: ?>
 
-        <div class="dual-value large-3 column" style="display: none;">
-            <?php echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min')); ?>
-            <?php echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max')); ?>
-            <?php echo CHtml::error($this, "[$id]minValue"); ?>
-            <?php echo CHtml::error($this, "[$id]maxValue"); ?>
-        </div>
-        <div class="single-value large-3 column">
-            <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
-            <?php echo CHtml::error($this, "[$id]textValue"); ?>
-        </div>
-        <div class="large-2 column">
-            <p>years of age</p>
-        </div>
+      <div class="dual-value large-3 column" style="display: none;">
+          <?php echo CHtml::activeTextField($this, "[$id]minValue", array('placeholder' => 'min')); ?>
+          <?php echo CHtml::activeTextField($this, "[$id]maxValue", array('placeholder' => 'max')); ?>
+          <?php echo CHtml::error($this, "[$id]minValue"); ?>
+          <?php echo CHtml::error($this, "[$id]maxValue"); ?>
+      </div>
+      <div class="single-value large-3 column">
+          <?php echo CHtml::activeTextField($this, "[$id]textValue"); ?>
+          <?php echo CHtml::error($this, "[$id]textValue"); ?>
+      </div>
+      <div class="large-2 column">
+        <p>years of age</p>
+      </div>
 
-        <?php endif; ?>
+    <?php endif; ?>
         <?php
     }
 
     /**
      * Generate the SQL query for patient age.
-     * @param $searchProvider SearchProvider The search provider building the query.
+     * @param $searchProvider DBProvider The search provider building the query.
      * @return null|string The query string for use by the search provider, or null if not implemented for the specified search provider.
      * @throws CHttpException
      */
     public function query($searchProvider)
     {
-        if ($searchProvider->providerID  === 'mysql')
-        {
-            switch ($this->operation)
-            {
-                case 'BETWEEN':
-                    $op = 'BETWEEN';
-                    break;
-                case '>':
-                    $op = '>';
-                    break;
-                case '<':
-                    $op = '<';
-                    break;
-                case '>=':
-                    $op = '>=';
-                    break;
-                case '<=':
-                    $op = '<=';
-                    break;
-                case '=':
-                    $op = '=';
-                    break;
-                case '!=':
-                    $op = '!=';
-                    break;
-                default:
-                    throw new CHttpException(400, 'Invalid operator specified.');
-                    break;
-            }
-
-            $queryStr = 'SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE()))';
-            if ($op === 'BETWEEN') {
-                return "$queryStr $op :p_a_min_$this->id AND :p_a_max_$this->id";
-            }
-            else
-            {
-                return "$queryStr $op :p_a_value_$this->id";
-            }
-
+        switch ($this->operation) {
+            case 'BETWEEN':
+                $op = 'BETWEEN';
+                break;
+            case '>':
+                $op = '>';
+                break;
+            case '<':
+                $op = '<';
+                break;
+            case '>=':
+                $op = '>=';
+                break;
+            case '<=':
+                $op = '<=';
+                break;
+            case '=':
+                $op = '=';
+                break;
+            case '!=':
+                $op = '!=';
+                break;
+            default:
+                throw new CHttpException(400, 'Invalid operator specified.');
+                break;
         }
-        else
-        {
-            return null; // Not yet implemented.
+
+        $queryStr = 'SELECT id FROM patient WHERE TIMESTAMPDIFF(YEAR, dob, IFNULL(date_of_death, CURDATE()))';
+        if ($op === 'BETWEEN') {
+            return "$queryStr $op :p_a_min_$this->id AND :p_a_max_$this->id";
         }
+        return "$queryStr $op :p_a_value_$this->id";
     }
 
     /**
@@ -218,19 +201,16 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
     public function bindValues()
     {
         $bindValues = array();
-        if (strlen($this->minValue) !== 0)
-        {
-            $bindValues["p_a_min_$this->id"] = intval($this->minValue);
+        if (strlen($this->minValue) !== 0) {
+            $bindValues["p_a_min_$this->id"] = (int)$this->minValue;
         }
 
-        if (strlen($this->maxValue) !== 0)
-        {
-            $bindValues["p_a_max_$this->id"] = intval($this->maxValue);
+        if (strlen($this->maxValue) !== 0) {
+            $bindValues["p_a_max_$this->id"] = (int)$this->maxValue;
         }
 
-        if (strlen($this->textValue) !== 0)
-        {
-            $bindValues["p_a_value_$this->id"] = intval($this->textValue);
+        if (strlen($this->textValue) !== 0) {
+            $bindValues["p_a_value_$this->id"] = (int)$this->textValue;
         }
 
         return $bindValues;
@@ -247,7 +227,7 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
     /**
      * @param $joinAlias string Alias of the table.
      * @param $criteria array Criteria used for JOINs.
-     * @param $searchProvider SearchProvider The search provider constructing the JOIN SQL statement.
+     * @param $searchProvider DBProvider The search provider constructing the JOIN SQL statement.
      * @return string The constructed SQL JOIN statement.
      */
     public function join($joinAlias, $criteria, $searchProvider)
@@ -256,11 +236,9 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
         $subQuery = $this->query($searchProvider);
         $query = '';
         $alias = $this->alias();
-        foreach ($criteria as $key => $column)
-        {
+        foreach ($criteria as $key => $column) {
             // if the string isn't empty, the condition is not the first so prepend it with an AND.
-            if (!empty($query))
-            {
+            if (!empty($query)) {
                 $query .= ' AND ';
             }
             $query .= "$joinAlias.$key = $alias.$column";

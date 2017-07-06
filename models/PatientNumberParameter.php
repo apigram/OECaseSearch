@@ -1,21 +1,8 @@
 <?php
 
-class FamilyHistoryParameter extends CaseSearchParameter implements DBProviderInterface
+class PatientNumberParameter extends CaseSearchParameter implements DBProviderInterface
 {
-    /**
-     * @var $relative integer
-     */
-    public $relative;
-
-    /**
-     * @var $side integer
-     */
-    public $side;
-
-    /**
-     * @var $condition integer
-     */
-    public $condition;
+    public $number;
 
     /**
      * CaseSearchParameter constructor. This overrides the parent constructor so that the name can be immediately set.
@@ -24,13 +11,13 @@ class FamilyHistoryParameter extends CaseSearchParameter implements DBProviderIn
     public function __construct($scenario = '')
     {
         parent::__construct($scenario);
-        $this->name = 'family_history';
+        $this->name = 'patient_number';
     }
 
     public function getLabel()
     {
         // This is a human-readable value, so feel free to change this as required.
-        return 'Family History';
+        return 'CERA Number';
     }
 
     /**
@@ -40,11 +27,16 @@ class FamilyHistoryParameter extends CaseSearchParameter implements DBProviderIn
     public function attributeNames()
     {
         return array_merge(parent::attributeNames(), array(
-                'relative',
-                'side',
-                'condition',
+                'number',
             )
         );
+    }
+
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), array(
+            'number' => 'Value',
+        ));
     }
 
     /**
@@ -54,80 +46,51 @@ class FamilyHistoryParameter extends CaseSearchParameter implements DBProviderIn
     public function rules()
     {
         return array_merge(parent::rules(), array(
-                array('condition', 'required'),
-                array('relative, side, condition', 'safe'),
-            )
-        );
+            array('number', 'required'),
+            array('number', 'numerical'),
+        ));
     }
 
     public function renderParameter($id)
     {
+        // Initialise any rendering variables here.
         $ops = array(
-            '=' => 'has',
-            '!=' => 'does not have',
+            '=' => 'Is',
         );
-        $relativeList = FamilyHistoryRelative::model()->findAll();
-        $sideList = FamilyHistorySide::model()->findAll();
-        $conditionList = FamilyHistoryCondition::model()->findAll();
-
-        $relatives = CHtml::listData($relativeList, 'id', 'name');
-        $sides = CHtml::listData($sideList, 'id', 'name');
-        $conditions = CHtml::listData($conditionList, 'id', 'name');
-
         ?>
+      <!-- Place screen-rendering code here. -->
       <div class="large-2 column">
           <?php echo CHtml::label($this->getLabel(), false); ?>
       </div>
-
-      <div class="large-2 column">
-          <?php echo CHtml::activeDropDownList($this, "[$id]side", $sides, array('empty' => 'Any side')); ?>
-      </div>
-
-      <div class="large-2 column">
-          <?php echo CHtml::activeDropDownList($this, "[$id]relative", $relatives, array('empty' => 'Any relative')); ?>
-      </div>
-
-      <div class="large-2 column">
+      <div class="large-3 column">
           <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
           <?php echo CHtml::error($this, "[$id]operation"); ?>
       </div>
-      <div class="large-2 column">
-          <?php echo CHtml::activeDropDownList($this, "[$id]condition", $conditions,
-              array('prompt' => 'Select One...')); ?>
-          <?php echo CHtml::error($this, "[$id]condition"); ?>
+      <div class="large-5 column">
+          <?php echo CHtml::activeTextField($this, "[$id]number"); ?>
+          <?php echo CHtml::error($this, "[$id]number"); ?>
       </div>
-
         <?php
     }
 
     /**
      * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider DBProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+     * @param $searchProvider DBProvider The database search provider.
      * @return string The constructed query string.
      * @throws CHttpException
      */
     public function query($searchProvider)
     {
-        switch ($this->operation) {
-            case '=':
-                $op = '=';
-                break;
-            case '!=':
-                $op = '!=';
-                break;
-            default:
-                throw new CHttpException(400, 'Invalid operator specified.');
-                break;
+        $op = null;
+        if ($this->operation === '=') {
+            $op = '=';
+        } else {
+            throw new CHttpException(400, 'Invalid operator specified.');
         }
 
-        return "
-SELECT p.id 
-FROM patient p 
-JOIN family_history fh
-  ON fh.patient_id = p.id
-WHERE (:f_h_side_$this->id IS NULL OR fh.side_id = :f_h_side_$this->id)
-  AND (:f_h_relative_$this->id IS NULL OR fh.relative_id = :f_h_relative_$this->id)
-  AND (:f_h_condition_$this->id $op :f_h_condition_$this->id)";
+        return "SELECT DISTINCT p.id 
+FROM patient p
+WHERE p.hos_num $op :p_num_number_$this->id";
     }
 
     /**
@@ -138,9 +101,7 @@ WHERE (:f_h_side_$this->id IS NULL OR fh.side_id = :f_h_side_$this->id)
     {
         // Construct your list of bind values here. Use the format "bind" => "value".
         return array(
-            "f_h_relative_$this->id" => $this->relative,
-            "f_h_side_$this->id" => $this->side,
-            "f_h_condition_$this->id" => $this->condition,
+            "p_num_number_$this->id" => $this->number,
         );
     }
 
@@ -148,8 +109,8 @@ WHERE (:f_h_side_$this->id IS NULL OR fh.side_id = :f_h_side_$this->id)
      * Generate a SQL fragment representing a JOIN condition to a subquery.
      * @param $joinAlias string The alias of the table being joined to.
      * @param $criteria array An array of join conditions. The ID for each element is the column name from the aliased table.
-     * @param $searchProvider DBProvider The search provider. This is used for an internal query invocation for subqueries.
-     * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
+     * @param $searchProvider SearchProvider The search provider. This is used for an internal query invocation for subqueries.
+     * @return mixed A SQL string representing a complete join condition. Join type is specified within the subclass definition.
      */
     public function join($joinAlias, $criteria, $searchProvider)
     {
@@ -176,6 +137,6 @@ WHERE (:f_h_side_$this->id IS NULL OR fh.side_id = :f_h_side_$this->id)
      */
     public function alias()
     {
-        return "f_h_$this->id";
+        return "p_num_$this->id";
     }
 }

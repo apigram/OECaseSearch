@@ -13,7 +13,7 @@ class PatientDeceasedParameter extends CaseSearchParameter implements DBProvider
         $this->operation = false;
     }
 
-    public function getKey()
+    public function getLabel()
     {
         // This is a human-readable value, so feel free to change this as required.
         return 'Patient Deceased';
@@ -55,25 +55,23 @@ class PatientDeceasedParameter extends CaseSearchParameter implements DBProvider
 
     /**
      * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider SearchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
-     * @return mixed The constructed query string.
+     * @param $searchProvider DBProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+     * @return string The constructed query string.
      * @throws CHttpException
      */
     public function query($searchProvider)
     {
-        // Construct your SQL query here.
-        if ($searchProvider->providerID === 'mysql') {
-            if ($this->operation === '1') {
-                // Return all patients.
-                return "SELECT id FROM patient";
-            } elseif ($this->operation === '0') {
-                // Return only non-deceased patients.
-                return "SELECT id FROM patient WHERE NOT(is_deceased)";
-            } else {
+        switch ($this->operation)
+        {
+            case '0':
+                return 'SELECT id FROM patient WHERE NOT(is_deceased)';
+                break;
+            case '1':
+                return 'SELECT id FROM patient';
+                break;
+            default:
                 throw new CHttpException(400, "Invalid value specified: $this->operation");
-            }
-        } else {
-            return null;
+                break;
         }
     }
 
@@ -92,8 +90,8 @@ class PatientDeceasedParameter extends CaseSearchParameter implements DBProvider
      * Generate a SQL fragment representing a JOIN condition to a subquery.
      * @param $joinAlias string The alias of the table being joined to.
      * @param $criteria array An array of join conditions. The ID for each element is the column name from the aliased table.
-     * @param $searchProvider SearchProvider The search provider. This is used for an internal query invocation for subqueries.
-     * @return mixed A SQL string representing a complete join condition. Join type is specified within the subclass definition.
+     * @param $searchProvider DBProvider The search provider. This is used for an internal query invocation for subqueries.
+     * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
      */
     public function join($joinAlias, $criteria, $searchProvider)
     {

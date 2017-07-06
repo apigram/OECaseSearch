@@ -14,7 +14,7 @@ class PatientNameParameter extends CaseSearchParameter implements DBProviderInte
         $this->name = 'patient_name';
     }
 
-    public function getKey()
+    public function getLabel()
     {
         // This is a human-readable value, so feel free to change this as required.
         return 'Patient Name';
@@ -35,7 +35,7 @@ class PatientNameParameter extends CaseSearchParameter implements DBProviderInte
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), array(
-            'patient_name' => 'Patient Name'
+            'patient_name' => 'Patient Name',
         ));
     }
 
@@ -47,7 +47,6 @@ class PatientNameParameter extends CaseSearchParameter implements DBProviderInte
     {
         return array_merge(parent::rules(), array(
             array('patient_name', 'required'),
-            array('patient_name', 'safe'),
         ));
     }
 
@@ -59,7 +58,7 @@ class PatientNameParameter extends CaseSearchParameter implements DBProviderInte
         ?>
       <!-- Place screen-rendering code here. -->
       <div class="large-2 column">
-          <?php echo CHtml::label($this->getKey(), false); ?>
+          <?php echo CHtml::label($this->getLabel(), false); ?>
       </div>
       <div class="large-3 column">
           <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
@@ -74,35 +73,30 @@ class PatientNameParameter extends CaseSearchParameter implements DBProviderInte
 
     /**
      * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider SearchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
-     * @return mixed The constructed query string.
+     * @param $searchProvider DBProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
+     * @return string The constructed query string.
      * @throws CHttpException
      */
     public function query($searchProvider)
     {
-        // Construct your SQL query here.
-        if ($searchProvider->providerID === 'mysql') {
-            $op = null;
-            switch ($this->operation) {
-                case 'LIKE':
-                    $op = 'LIKE';
-                    break;
-                case 'NOT LIKE':
-                    $op = 'NOT LIKE';
-                    break;
-                default:
-                    throw new CHttpException(400, 'Invalid operator specified.');
-                    break;
-            }
+        $op = null;
+        switch ($this->operation) {
+            case 'LIKE':
+                $op = 'LIKE';
+                break;
+            case 'NOT LIKE':
+                $op = 'NOT LIKE';
+                break;
+            default:
+                throw new CHttpException(400, 'Invalid operator specified.');
+                break;
+        }
 
-            return "SELECT DISTINCT p.id 
+        return "SELECT DISTINCT p.id 
 FROM patient p 
 JOIN contact c 
   ON c.id = p.contact_id
 WHERE LOWER(CONCAT(c.first_name, ' ', c.last_name)) $op LOWER(:p_n_name_$this->id)";
-        } else {
-            return null; // Not yet implemented.
-        }
     }
 
     /**
@@ -121,8 +115,8 @@ WHERE LOWER(CONCAT(c.first_name, ' ', c.last_name)) $op LOWER(:p_n_name_$this->i
      * Generate a SQL fragment representing a JOIN condition to a subquery.
      * @param $joinAlias string The alias of the table being joined to.
      * @param $criteria array An array of join conditions. The ID for each element is the column name from the aliased table.
-     * @param $searchProvider SearchProvider The search provider. This is used for an internal query invocation for subqueries.
-     * @return mixed A SQL string representing a complete join condition. Join type is specified within the subclass definition.
+     * @param $searchProvider DBProvider The search provider. This is used for an internal query invocation for subqueries.
+     * @return string A SQL string representing a complete join condition. Join type is specified within the subclass definition.
      */
     public function join($joinAlias, $criteria, $searchProvider)
     {

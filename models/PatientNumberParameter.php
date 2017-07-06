@@ -14,7 +14,7 @@ class PatientNumberParameter extends CaseSearchParameter implements DBProviderIn
         $this->name = 'patient_number';
     }
 
-    public function getKey()
+    public function getLabel()
     {
         // This is a human-readable value, so feel free to change this as required.
         return 'CERA Number';
@@ -35,7 +35,7 @@ class PatientNumberParameter extends CaseSearchParameter implements DBProviderIn
     public function attributeLabels()
     {
         return array_merge(parent::attributeLabels(), array(
-            'number' => 'Value'
+            'number' => 'Value',
         ));
     }
 
@@ -48,7 +48,6 @@ class PatientNumberParameter extends CaseSearchParameter implements DBProviderIn
         return array_merge(parent::rules(), array(
             array('number', 'required'),
             array('number', 'numerical'),
-            array('number', 'safe')
         ));
     }
 
@@ -61,7 +60,7 @@ class PatientNumberParameter extends CaseSearchParameter implements DBProviderIn
         ?>
       <!-- Place screen-rendering code here. -->
       <div class="large-2 column">
-          <?php echo CHtml::label($this->getKey(), false); ?>
+          <?php echo CHtml::label($this->getLabel(), false); ?>
       </div>
       <div class="large-3 column">
           <?php echo CHtml::activeDropDownList($this, "[$id]operation", $ops, array('prompt' => 'Select One...')); ?>
@@ -76,33 +75,22 @@ class PatientNumberParameter extends CaseSearchParameter implements DBProviderIn
 
     /**
      * Generate a SQL fragment representing the subquery of a FROM condition.
-     * @param $searchProvider SearchProvider The search provider. This is used to determine whether or not the search provider is using SQL syntax.
-     * @return mixed The constructed query string.
+     * @param $searchProvider DBProvider The database search provider.
+     * @return string The constructed query string.
      * @throws CHttpException
      */
     public function query($searchProvider)
     {
-        // Construct your SQL query here.
-        if ($searchProvider->providerID === 'mysql')
-        {
-            $op = null;
-            switch ($this->operation)
-            {
-                case '=':
-                    $op = '=';
-                    break;
-                default:
-                    throw new CHttpException(400, 'Invalid operator specified.');
-                    break;
-            }
-            return "SELECT DISTINCT p.id 
+        $op = null;
+        if ($this->operation === '=') {
+            $op = '=';
+        } else {
+            throw new CHttpException(400, 'Invalid operator specified.');
+        }
+
+        return "SELECT DISTINCT p.id 
 FROM patient p
 WHERE p.hos_num $op :p_num_number_$this->id";
-        }
-        else
-        {
-            return null; // Not yet implemented.
-        }
     }
 
     /**
@@ -130,11 +118,9 @@ WHERE p.hos_num $op :p_num_number_$this->id";
         $subQuery = $this->query($searchProvider);
         $query = '';
         $alias = $this->alias();
-        foreach ($criteria as $key => $column)
-        {
+        foreach ($criteria as $key => $column) {
             // if the string isn't empty, the condition is not the first so prepend it with an AND.
-            if (!empty($query))
-            {
+            if (!empty($query)) {
                 $query .= ' AND ';
             }
             $query .= "$joinAlias.$key = $alias.$column";

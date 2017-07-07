@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: andre
- * Date: 31/05/2017
- * Time: 3:39 PM
+ * Class PatientAgeParameterTest
  */
 class PatientAgeParameterTest extends CDbTestCase
 {

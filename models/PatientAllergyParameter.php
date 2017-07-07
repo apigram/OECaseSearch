@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class PatientAllergyParameter
+ */
 class PatientAllergyParameter extends CaseSearchParameter implements DBProviderInterface
 {
     public $textValue;

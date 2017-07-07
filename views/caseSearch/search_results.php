@@ -1,6 +1,6 @@
 <?php
 /* @var $data Patient
- *
+ * @var $this CaseSearchController
  */
 
 ?>

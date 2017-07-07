@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: andre
- * Date: 31/05/2017
- * Time: 4:51 PM
+ * Class PatientAllergyParameterTest
  */
 class PatientAllergyParameterTest extends CDbTestCase
 {

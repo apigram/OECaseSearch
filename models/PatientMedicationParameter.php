@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class PatientMedicationParameter
+ */
 class PatientMedicationParameter extends CaseSearchParameter implements DBProviderInterface
 {
     public $textValue;

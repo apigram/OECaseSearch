@@ -26,15 +26,15 @@ abstract class SearchProvider
      */
     public final function __get($name)
     {
-        if ($name === 'providerID')
-        {
+        if ($name === 'providerID') {
             return $this->_providerID;
         }
         $trace = debug_backtrace();
         trigger_error('Undefined property via __get(): ' . $name .
-        ' in ' . $trace[0]['file'] .
-        ' on line '. $trace[0]['line'],
+            ' in ' . $trace[0]['file'] .
+            ' on line ' . $trace[0]['line'],
             E_USER_NOTICE);
+
         return null;
     }
 

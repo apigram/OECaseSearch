@@ -31,10 +31,10 @@ class AutoCompleteController extends BaseModuleController
      */
     public function actionCommonDiagnoses($term)
     {
-        $disorders = Disorder::model()->findAllBySql("SELECT * FROM disorder WHERE term LIKE :term ORDER BY term LIMIT 30", array('term' => "%$term%"));
+        $disorders = Disorder::model()->findAllBySql("SELECT * FROM disorder WHERE term LIKE :term ORDER BY term LIMIT 30",
+            array('term' => "%$term%"));
         $values = array();
-        foreach ($disorders as $disorder)
-        {
+        foreach ($disorders as $disorder) {
             $values[] = $disorder->term;
         }
 
@@ -58,16 +58,13 @@ FROM medication_drug md
 WHERE LCASE(md.name) LIKE LCASE(:term) ORDER BY md.name LIMIT 30", array('term' => "$term%"));
 
         $values = array();
-        foreach ($drugs as $drug)
-        {
+        foreach ($drugs as $drug) {
             $values[$drug->name] = $drug->name;
         }
 
-        foreach ($medicationDrugs as $medicationDrug)
-        {
+        foreach ($medicationDrugs as $medicationDrug) {
             // Filter out any duplicates.
-            if (!isset($values[$medicationDrug->name]))
-            {
+            if (!isset($values[$medicationDrug->name])) {
                 $values[$medicationDrug->name] = $medicationDrug->name;
             }
         }
@@ -88,8 +85,7 @@ SELECT a.*
 FROM allergy a 
 WHERE LCASE(a.name) LIKE LCASE(:term) ORDER BY a.name LIMIT 30", array('term' => "%$term%"));
         $values = array();
-        foreach ($allergies as $allergy)
-        {
+        foreach ($allergies as $allergy) {
             $values[] = $allergy->name;
         }
 

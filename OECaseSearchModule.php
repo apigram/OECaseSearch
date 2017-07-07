@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class OECaseSearchModule
+ */
 class OECaseSearchModule extends CWebModule
 {
     private $searchProviders = array();

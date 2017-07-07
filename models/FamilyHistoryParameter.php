@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class FamilyHistoryParameter
+ */
 class FamilyHistoryParameter extends CaseSearchParameter implements DBProviderInterface
 {
     /**

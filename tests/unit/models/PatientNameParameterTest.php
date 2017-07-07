@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class PatientNameParameterTest
+ */
 class PatientNameParameterTest extends CDbTestCase
 {
     protected $parameter;

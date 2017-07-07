@@ -1,5 +1,6 @@
 <?php
-/* @var $this ParameterController */
+/* @var $this CaseSearchController */
+/* @var $id int*/
 /* @var $model CaseSearchParameter */
 /* @var $form CActiveForm */
 ?>

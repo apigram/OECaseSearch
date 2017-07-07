@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class PatientDeceasedParameter
+ */
 class PatientDeceasedParameter extends CaseSearchParameter implements DBProviderInterface
 {
     /**

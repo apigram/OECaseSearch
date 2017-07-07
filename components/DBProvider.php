@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: andre
- * Date: 22/05/2017
- * Time: 10:18 AM
+ * Class DBProvider
  */
 class DBProvider extends SearchProvider
 {
@@ -19,14 +16,10 @@ class DBProvider extends SearchProvider
         $queryStr = null;
 
         // Construct the SQL search string using each parameter as a separate dataset merged using JOINs.
-        foreach ($criteria as $id => $param)
-        {
-            if ($queryStr !== null)
-            {
+        foreach ($criteria as $id => $param) {
+            if ($queryStr !== null) {
                 $queryStr .= $param->join($criteria[$lastID]->alias(), array('id' => 'id'), $this);
-            }
-            else
-            {
+            } else {
                 $from = $param->query($this);
                 $alias = $param->alias();
                 $queryStr = "SELECT $alias.id FROM ($from) $alias";

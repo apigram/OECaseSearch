@@ -1,11 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: andre
- * Date: 3/07/2017
- * Time: 11:32 AM
- */
 
+/**
+ * Interface DBProviderInterface
+ */
 interface DBProviderInterface
 {
     /**

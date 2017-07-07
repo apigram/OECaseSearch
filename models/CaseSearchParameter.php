@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: andre
- * Date: 22/05/2017
- * Time: 11:11 AM
+ * Class CaseSearchParameter
  */
 abstract class CaseSearchParameter extends CFormModel
 {

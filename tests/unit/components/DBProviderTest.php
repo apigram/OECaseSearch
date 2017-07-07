@@ -1,10 +1,7 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: andre
- * Date: 2/06/2017
- * Time: 10:55 AM
+ * Class DBProviderTest
  */
 class DBProviderTest extends CDbTestCase
 {

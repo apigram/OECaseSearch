@@ -30,6 +30,9 @@ class PatientNameParameterTest extends CDbTestCase
      * @covers DBProvider::search()
      * @covers DBProvider::executeSearch()
      * @covers PatientNameParameter::query()
+     * @covers PatientNameParameter::bindValues()
+     * @covers PatientNameParameter::alias()
+     * @covers PatientNameParameter::join()
      */
     public function testSearch()
     {
@@ -38,7 +41,11 @@ class PatientNameParameterTest extends CDbTestCase
         $this->parameter->operation = 'LIKE';
         $this->parameter->patient_name = 'Jim';
 
-        $results = $this->searchProvider->search(array($this->parameter));
+        $secondParam = new PatientNameParameter();
+        $secondParam->operation = 'LIKE';
+        $secondParam->patient_name = 'Jim';
+
+        $results = $this->searchProvider->search(array($this->parameter, $secondParam));
 
         $ids = array();
 
@@ -62,5 +69,11 @@ class PatientNameParameterTest extends CDbTestCase
         }
         $actual = Patient::model()->findAllByPk($ids);
         $this->assertEquals($expected, $actual);
+
+        $this->setExpectedException(CHttpException::class);
+
+        $this->parameter->operation = 'NOT LIKE';
+
+        $this->searchProvider->search(array($this->parameter));
     }
 }

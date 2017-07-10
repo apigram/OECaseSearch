@@ -7,7 +7,6 @@ class PatientDeceasedParameterTest extends CDbTestCase
 {
     protected $parameter;
     protected $searchProvider;
-    protected $invalidProvider;
     protected $fixtures = array(
         'patient' => 'Patient'
     );

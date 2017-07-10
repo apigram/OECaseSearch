@@ -87,9 +87,6 @@ class PatientNameParameter extends CaseSearchParameter implements DBProviderInte
             case 'LIKE':
                 $op = 'LIKE';
                 break;
-            case 'NOT LIKE':
-                $op = 'NOT LIKE';
-                break;
             default:
                 throw new CHttpException(400, 'Invalid operator specified.');
                 break;

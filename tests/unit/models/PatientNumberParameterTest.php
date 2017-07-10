@@ -7,22 +7,22 @@ class PatientNumberParameterTest extends CDbTestCase
 {
     protected $parameter;
     protected $searchProvider;
-    protected $invalidProvider;
     protected $fixtures = array(
         'patient' => 'Patient'
     );
 
     protected function setUp()
     {
+        parent::setUp();
         $this->parameter = new PatientNumberParameter();
         $this->searchProvider = new DBProvider('mysql');
-        $this->invalidProvider = new DBProvider('invalid');
         $this->parameter->id = 0;
     }
 
     protected function tearDown()
     {
-        unset($this->parameter, $this->searchProvider, $this->invalidProvider);
+        parent::tearDown();
+        unset($this->parameter, $this->searchProvider);
     }
 
     /**

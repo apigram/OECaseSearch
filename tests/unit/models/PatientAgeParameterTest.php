@@ -15,11 +15,6 @@ class PatientAgeParameterTest extends CDbTestCase
      */
     protected $searchProvider;
 
-    /**
-     * @var DBProvider
-     */
-    protected $invalidProvider;
-
     protected $fixtures = array(
         'patient' => 'Patient',
     );
@@ -34,16 +29,13 @@ class PatientAgeParameterTest extends CDbTestCase
         parent::setUp();
         $this->parameter = new PatientAgeParameter();
         $this->searchProvider = new DBProvider('mysql');
-        $this->invalidProvider = new DBProvider('invalid');
         $this->parameter->id = 0;
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-        unset($this->parameter); // start from scratch for each test.
-        unset($this->searchProvider);
-        unset($this->invalidProvider);
+        unset($this->parameter, $this->searchProvider);
     }
 
     /**
@@ -79,7 +71,6 @@ class PatientAgeParameterTest extends CDbTestCase
             }
             $this->assertEquals($sqlValue, $this->parameter->query($this->searchProvider));
         }
-        $this->assertNull($this->parameter->query($this->invalidProvider));
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
         $this->setExpectedException(CHttpException::class);

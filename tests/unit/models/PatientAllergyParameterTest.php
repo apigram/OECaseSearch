@@ -11,14 +11,10 @@ class PatientAllergyParameterTest extends CDbTestCase
     protected $object;
 
     /**
-     * @var SearchProvider
+     * @var DBProvider
      */
     protected $searchProvider;
 
-    /**
-     * @var SearchProvider
-     */
-    protected $invalidProvider;
     protected $fixtures = array(
         'patient' => 'Patient',
         'allergy' => 'Allergy',
@@ -30,16 +26,13 @@ class PatientAllergyParameterTest extends CDbTestCase
         parent::setUp();
         $this->object = new PatientAllergyParameter();
         $this->searchProvider = new DBProvider('mysql');
-        $this->invalidProvider = new DBProvider('invalid');
         $this->object->id = 0;
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-        unset($this->object); // start from scratch for each test.
-        unset($this->searchProvider);
-        unset($this->invalidProvider);
+        unset($this->object, $this->searchProvider);
     }
 
     /**
@@ -57,13 +50,13 @@ class PatientAllergyParameterTest extends CDbTestCase
             'NOT LIKE',
         );
 
-        $sqlValue = "SELECT DISTINCT p.id 
+        $sqlValue = 'SELECT DISTINCT p.id 
 FROM patient p 
 LEFT JOIN patient_allergy_assignment paa
   ON paa.patient_id = p.id
 LEFT JOIN allergy a
   ON a.id = paa.allergy_id
-WHERE a.name = :p_al_textValue_0";
+WHERE a.name = :p_al_textValue_0';
 
         // Ensure the query is correct for each operator.
         foreach ($correctOps as $operator) {
@@ -79,7 +72,6 @@ WHERE p1.id NOT IN (
 
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
-        $this->assertNull($this->object->query($this->invalidProvider));
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
         $this->setExpectedException(CHttpException::class);

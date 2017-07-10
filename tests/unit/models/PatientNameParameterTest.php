@@ -7,7 +7,6 @@ class PatientNameParameterTest extends CDbTestCase
 {
     protected $parameter;
     protected $searchProvider;
-    protected $invalidProvider;
     protected $fixtures = array(
         'patient' => 'Patient',
         'contact' => 'Contact'
@@ -18,7 +17,6 @@ class PatientNameParameterTest extends CDbTestCase
         parent::setUp();
         $this->parameter = new PatientNameParameter();
         $this->searchProvider = new DBProvider('mysql');
-        $this->invalidProvider = new DBProvider('invalid');
         $this->parameter->id = 0;
     }
 

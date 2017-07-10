@@ -7,8 +7,6 @@ class FamilyHistoryParameterTest extends CDbTestCase
 {
     protected $object;
     protected $searchProvider;
-    protected $invalidProvider;
-
 
     public static function setupBeforeClass()
     {
@@ -20,16 +18,13 @@ class FamilyHistoryParameterTest extends CDbTestCase
         parent::setUp();
         $this->object = new FamilyHistoryParameter();
         $this->searchProvider = new DBProvider('mysql');
-        $this->invalidProvider = new DBProvider('invalid');
         $this->object->id = 0;
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-        unset($this->object); // start from scratch for each test.
-        unset($this->searchProvider);
-        unset($this->invalidProvider);
+        unset($this->object, $this->searchProvider);
     }
 
     /**
@@ -58,7 +53,6 @@ WHERE (:f_h_side_0 IS NULL OR fh.side_id = :f_h_side_0)
   AND (:f_h_condition_0 $operator :f_h_condition_0)";
             $this->assertEquals($sqlValue, $this->object->query($this->searchProvider));
         }
-        $this->assertNull($this->object->query($this->invalidProvider));
 
         // Ensure that a HTTP exception is raised if an invalid operation is specified.
         $this->setExpectedException(CHttpException::class);
@@ -77,9 +71,9 @@ WHERE (:f_h_side_0 IS NULL OR fh.side_id = :f_h_side_0)
         $this->object->side = 1;
         $this->object->condition = 1;
         $expected = array(
-            "f_h_relative_0" => 1,
-            "f_h_side_0" => 1,
-            "f_h_condition_0" => 1,
+            'f_h_relative_0' => 1,
+            'f_h_side_0' => 1,
+            'f_h_condition_0' => 1,
         );
 
         // Ensure that all bind values are returned.

@@ -47,6 +47,9 @@ class DBProviderTest extends CDbTestCase
         $this->assertNotEmpty($results);
     }
 
+    /**
+     * @covers SearchProvider::__get()
+     */
     public function testMagicMethods()
     {
         // Ensure that the provider ID can be retrieved by simply referring to it.

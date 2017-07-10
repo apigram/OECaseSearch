@@ -30,6 +30,8 @@ class PatientNumberParameterTest extends CDbTestCase
      * @covers DBProvider::executeSearch()
      * @covers PatientNumberParameter::query()
      * @covers PatientNumberParameter::bindValues()
+     * @covers PatientNumberParameter::join()
+     * @covers PatientNumberParameter::alias()
      */
     public function testSearch()
     {
@@ -38,11 +40,21 @@ class PatientNumberParameterTest extends CDbTestCase
         $this->parameter->operation = '=';
         $this->parameter->number = 12345;
 
-        $results = $this->searchProvider->search(array($this->parameter));
+        $secondParam = new PatientNumberParameter();
+        $secondParam->operation = '=';
+        $secondParam->number = 12345;
+
+        $results = $this->searchProvider->search(array($this->parameter, $secondParam));
 
         $this->assertCount(1, $results);
         $actual = Patient::model()->findAllByPk($results[0]);
 
         $this->assertEquals($expected, $actual);
+
+        $this->setExpectedException(CHttpException::class);
+
+        $this->parameter->operation = '!=';
+
+        $this->searchProvider->search(array($this->parameter));
     }
 }

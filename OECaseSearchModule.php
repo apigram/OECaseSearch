@@ -7,6 +7,9 @@ class OECaseSearchModule extends CWebModule
 {
     private $searchProviders = array();
     private $_assetsUrl;
+    /**
+     * @var array
+     */
     private $config;
 
     public function init()
@@ -53,14 +56,15 @@ class OECaseSearchModule extends CWebModule
     public function getFixedParams()
     {
         $fixedParams = array();
+        $count = 0;
         foreach ($this->config['fixedParameters'] as $group)
         {
             foreach ($group as $parameter)
             {
                 $className = $parameter . 'Parameter';
                 $obj = new $className;
-                $obj->id = 'fixed';
-                $fixedParams[$obj->alias()] = $obj;
+                $obj->id = "fixed_$count";
+                $fixedParams[$obj->id] = $obj;
             }
         }
         return $fixedParams;

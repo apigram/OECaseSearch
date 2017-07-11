@@ -76,12 +76,12 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
     public function values($attribute)
     {
         $label = $this->attributeLabels()[$attribute];
-        if ($attribute === 'minValue' or $attribute === 'maxValue') {
-            if ($this->operation === 'BETWEEN' and strlen($this->$attribute) === 0) {
+        if ($attribute === 'minValue' || $attribute === 'maxValue') {
+            if ($this->operation === 'BETWEEN' && $this->$attribute === '') {
                 $this->addError($attribute, "$label must be specified.");
             }
         } else {
-            if ($this->operation !== 'BETWEEN' and strlen($this->$attribute) === 0) {
+            if ($this->operation !== 'BETWEEN' && $this->$attribute === '') {
                 $this->addError($attribute, "$label must be specified.");
             }
         }
@@ -198,51 +198,18 @@ class PatientAgeParameter extends CaseSearchParameter implements DBProviderInter
     public function bindValues()
     {
         $bindValues = array();
-        if (strlen($this->minValue) !== 0) {
+        if ($this->minValue !== '' && $this->minValue !== null) {
             $bindValues["p_a_min_$this->id"] = (int)$this->minValue;
         }
 
-        if (strlen($this->maxValue) !== 0) {
+        if ($this->maxValue !== '' && $this->maxValue !== null) {
             $bindValues["p_a_max_$this->id"] = (int)$this->maxValue;
         }
 
-        if (strlen($this->textValue) !== 0) {
+        if ($this->textValue !== '' && $this->textValue !== null) {
             $bindValues["p_a_value_$this->id"] = (int)$this->textValue;
         }
 
         return $bindValues;
-    }
-
-    /**
-     * @return string Alias of the patient age parameter. Form is "p_a_#id".
-     */
-    public function alias()
-    {
-        return "p_a_$this->id";
-    }
-
-    /**
-     * @param $joinAlias string Alias of the table.
-     * @param $criteria array Criteria used for JOINs.
-     * @param $searchProvider DBProvider The search provider constructing the JOIN SQL statement.
-     * @return string The constructed SQL JOIN statement.
-     */
-    public function join($joinAlias, $criteria, $searchProvider)
-    {
-        // Construct your JOIN condition here. Generally this involves wrapping the query in a JOIN condition.
-        $subQuery = $this->query($searchProvider);
-        $query = '';
-        $alias = $this->alias();
-        foreach ($criteria as $key => $column) {
-            // if the string isn't empty, the condition is not the first so prepend it with an AND.
-            if (!empty($query)) {
-                $query .= ' AND ';
-            }
-            $query .= "$joinAlias.$key = $alias.$column";
-        }
-
-        $query = " JOIN ($subQuery) $alias ON " . $query;
-
-        return $query;
     }
 }

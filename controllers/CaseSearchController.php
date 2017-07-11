@@ -40,7 +40,7 @@ class CaseSearchController extends BaseModuleController
         }
 
         $this->trialContext = null;
-        if ($trial_id != null) {
+        if ($trial_id !== null) {
             $this->trialContext = Trial::model()->findByPk($trial_id);
         }
 
@@ -73,8 +73,8 @@ class CaseSearchController extends BaseModuleController
             }
         }
 
-        // This should only run if there are parameters and if all parameters are valid
-        if (!empty($parameters) and $valid) {
+        // This can always run as there will always be at least 1 fixed parameter included in the search. Just as long as it is valid!
+        if ($valid) {
             $mergedParams = array_merge($parameters, $fixedParameters);
             $this->actionClear();
             $searchProvider = $this->module->getSearchProvider('mysql');
@@ -88,7 +88,7 @@ class CaseSearchController extends BaseModuleController
             }
 
             // Only copy to the $_SESSION array if it isn't already there - Shallow copy is done at the start if it is already set.
-            if (!isset($_SESSION['last_search']) or empty($_SESSION['last_search'])) {
+            if (!isset($_SESSION['last_search']) || empty($_SESSION['last_search'])) {
                 $_SESSION['last_search'] = $ids;
             }
         }

@@ -96,28 +96,9 @@ WHERE p1.id NOT IN (
     }
 
     /**
-     * @covers PatientAllergyParameter::alias()
+     * @covers DBProvider::search()
+     * @covers PatientAllergyParameter::query()
      */
-    public function testAlias()
-    {
-        // Ensure that the alias correctly utilises the ID.
-        $expected = 'p_al_0';
-        $this->assertEquals($expected, $this->object->alias());
-    }
-
-    /**
-     * @covers PatientAllergyParameter::join()
-     */
-    public function testJoin()
-    {
-        $this->object->operation = '=';
-        $innerSql = $this->object->query($this->searchProvider);
-
-        // Ensure that the JOIN string is correct.
-        $expected = " JOIN ($innerSql) p_al_0 ON p_al_1.id = p_al_0.id";
-        $this->assertEquals($expected, $this->object->join('p_al_1', array('id' => 'id'), $this->searchProvider));
-    }
-
     public function testSearch()
     {
         $match = $this->patient('patient7');

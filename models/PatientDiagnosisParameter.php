@@ -111,7 +111,7 @@ WHERE LOWER(d.term) LIKE LOWER(:p_d_value_$this->id)";
         if ($this->isConfirmed === '0') {
             $query .= " AND sd.is_confirmed = :p_d_confirmed_$this->id";
         } elseif ($this->isConfirmed === '1') {
-            $query .= " AND (:p_d_confirmed_$this->id = " . self::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR sd.is_confirmed = :p_d_confirmed_$this->id";
+            $query .= " AND ((:p_d_confirmed_$this->id = " . self::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR sd.is_confirmed = :p_d_confirmed_$this->id)";
         }
         switch ($this->operation) {
             case 'LIKE':

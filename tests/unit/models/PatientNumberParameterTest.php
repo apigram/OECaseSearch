@@ -6,6 +6,9 @@
 class PatientNumberParameterTest extends CDbTestCase
 {
     protected $parameter;
+    /**
+     * @var DBProvider
+     */
     protected $searchProvider;
     protected $fixtures = array(
         'patient' => 'Patient'
@@ -30,8 +33,6 @@ class PatientNumberParameterTest extends CDbTestCase
      * @covers DBProvider::executeSearch()
      * @covers PatientNumberParameter::query()
      * @covers PatientNumberParameter::bindValues()
-     * @covers PatientNumberParameter::join()
-     * @covers PatientNumberParameter::alias()
      */
     public function testSearch()
     {

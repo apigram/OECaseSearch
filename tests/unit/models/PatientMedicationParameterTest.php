@@ -17,8 +17,7 @@ class PatientMedicationParameterTest extends CTestCase
 
     protected function tearDown()
     {
-        unset($this->object); // start from scratch for each test.
-        unset($this->searchProvider);
+        unset($this->object, $this->searchProvider);
     }
 
     /**
@@ -93,28 +92,5 @@ WHERE d.name $operator '$wildcard' || :p_m_value_0 || '$wildcard'
 
         // Ensure that all bind values are returned.
         $this->assertEquals($expected, $this->object->bindValues());
-    }
-
-    /**
-     * @covers PatientMedicationParameter::alias()
-     */
-    public function testAlias()
-    {
-        // Ensure that the alias correctly utilises the ID.
-        $expected = 'p_m_0';
-        $this->assertEquals($expected, $this->object->alias());
-    }
-
-    /**
-     * @covers PatientMedicationParameter::join()
-     */
-    public function testJoin()
-    {
-        $this->object->operation = 'LIKE';
-        $innerSql = $this->object->query($this->searchProvider);
-
-        // Ensure that the JOIN string is correct.
-        $expected = " JOIN ($innerSql) p_m_0 ON p_m_1.id = p_m_0.id";
-        $this->assertEquals($expected, $this->object->join('p_m_1', array('id' => 'id'), $this->searchProvider));
     }
 }

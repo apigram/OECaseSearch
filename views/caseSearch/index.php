@@ -1,5 +1,7 @@
 <?php
 /* @var $this CaseSearchController
+ * @var $fixedParams array
+ * @var $params array
  * @var $trial Trial
  */
 

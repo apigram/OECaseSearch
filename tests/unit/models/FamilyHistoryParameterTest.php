@@ -79,27 +79,4 @@ WHERE (:f_h_side_0 IS NULL OR fh.side_id = :f_h_side_0)
         // Ensure that all bind values are returned.
         $this->assertEquals($expected, $this->object->bindValues());
     }
-
-    /**
-     * @covers FamilyHistoryParameter::alias()
-     */
-    public function testAlias()
-    {
-        // Ensure that the alias correctly utilises the ID.
-        $expected = 'f_h_0';
-        $this->assertEquals($expected, $this->object->alias());
-    }
-
-    /**
-     * @covers FamilyHistoryParameter::join()
-     */
-    public function testJoin()
-    {
-        $this->object->operation = '=';
-        $innerSql = $this->object->query($this->searchProvider);
-
-        // Ensure that the JOIN string is correct.
-        $expected = " JOIN ($innerSql) f_h_0 ON f_h_1.id = f_h_0.id";
-        $this->assertEquals($expected, $this->object->join('f_h_1', array('id' => 'id'), $this->searchProvider));
-    }
 }

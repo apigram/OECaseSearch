@@ -23,7 +23,7 @@ class PatientNameParameterTest extends CDbTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        unset($this->parameter, $this->searchProvider, $this->invalidProvider);
+        unset($this->parameter, $this->searchProvider);
     }
 
     /**
@@ -31,8 +31,6 @@ class PatientNameParameterTest extends CDbTestCase
      * @covers DBProvider::executeSearch()
      * @covers PatientNameParameter::query()
      * @covers PatientNameParameter::bindValues()
-     * @covers PatientNameParameter::alias()
-     * @covers PatientNameParameter::join()
      */
     public function testSearch()
     {

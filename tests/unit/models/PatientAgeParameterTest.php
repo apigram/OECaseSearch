@@ -108,29 +108,6 @@ class PatientAgeParameterTest extends CDbTestCase
     }
 
     /**
-     * @covers PatientAgeParameter::alias()
-     */
-    public function testAlias()
-    {
-        // Ensure that the alias correctly utilises the ID.
-        $expected = 'p_a_0';
-        $this->assertEquals($expected, $this->parameter->alias());
-    }
-
-    /**
-     * @covers PatientAgeParameter::join()
-     */
-    public function testJoin()
-    {
-        $this->parameter->operation = '=';
-        $innerSql = $this->parameter->query($this->searchProvider);
-
-        // Ensure that the JOIN string is correct.
-        $expected = " JOIN ($innerSql) p_a_0 ON p_a_1.id = p_a_0.id";
-        $this->assertEquals($expected, $this->parameter->join('p_a_1', array('id' => 'id'), $this->searchProvider));
-    }
-
-    /**
      * @covers DBProvider::search()
      * @covers PatientAgeParameter::query()
      */
@@ -161,6 +138,10 @@ class PatientAgeParameterTest extends CDbTestCase
         $this->assertEmpty($results);
     }
 
+    /**
+     * @covers DBProvider::search()
+     * @covers PatientAgeParameter::query()
+     */
     public function testSearchDualInput()
     {
         $patients = array();

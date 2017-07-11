@@ -6,8 +6,11 @@
 class PatientDiagnosisParameterTest extends CDbTestCase
 {
     protected $object;
+
+    /**
+     * @var DBProvider
+     */
     protected $searchProvider;
-    protected $invalidProvider;
     protected $fixtures = array(
         'disorder' => 'Disorder',
         'secondary_diagnosis' => 'SecondaryDiagnosis',
@@ -54,20 +57,20 @@ class PatientDiagnosisParameterTest extends CDbTestCase
             foreach ($confirmedStates as $state)
             {
                 $this->object->isConfirmed = $state;
-                $sqlValue = "SELECT p.id 
+                $sqlValue = 'SELECT p.id 
 FROM patient p 
 LEFT JOIN secondary_diagnosis sd 
   ON sd.patient_id = p.id 
 LEFT JOIN disorder d 
   ON d.id = sd.disorder_id 
-WHERE LOWER(d.term) LIKE LOWER(:p_d_value_0)";
+WHERE LOWER(d.term) LIKE LOWER(:p_d_value_0)';
                 if ($state === '0')
                 {
-                    $sqlValue .= " AND sd.is_confirmed = :p_d_confirmed_0";
+                    $sqlValue .= ' AND sd.is_confirmed = :p_d_confirmed_0';
                 }
                 elseif ($state === '1')
                 {
-                    $sqlValue .= " AND (:p_d_confirmed_0 = " . PatientDiagnosisParameter::DIAGNOSIS_CONFIRMED . " AND sd.is_confirmed IS NULL) OR sd.is_confirmed = :p_d_confirmed_0";
+                    $sqlValue .= ' AND ((:p_d_confirmed_0 = ' . PatientDiagnosisParameter::DIAGNOSIS_CONFIRMED . ' AND sd.is_confirmed IS NULL) OR sd.is_confirmed = :p_d_confirmed_0)';
                 }
 
                 if ($operator === 'NOT LIKE')
@@ -115,28 +118,9 @@ WHERE p1.id NOT IN (
     }
 
     /**
-     * @covers PatientDiagnosisParameter::alias()
+     * @covers DBProvider::search()
+     * @covers PatientDiagnosisParameter::query()
      */
-    public function testAlias()
-    {
-        // Ensure that the alias correctly utilises the ID.
-        $expected = 'p_d_0';
-        $this->assertEquals($expected, $this->object->alias());
-    }
-
-    /**
-     * @covers PatientDiagnosisParameter::join()
-     */
-    public function testJoin()
-    {
-        $this->object->operation = 'LIKE';
-        $innerSql = $this->object->query($this->searchProvider);
-
-        // Ensure that the JOIN string is correct.
-        $expected = " JOIN ($innerSql) p_d_0 ON p_d_1.id = p_d_0.id";
-        $this->assertEquals($expected, $this->object->join('p_d_1', array('id' => 'id'), $this->searchProvider));
-    }
-
     public function testSearchLike()
     {
         $expected = array($this->patient('patient1'), $this->patient('patient2'));

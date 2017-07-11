@@ -11,23 +11,19 @@ class DBProvider extends SearchProvider
      */
     protected function executeSearch($criteria)
     {
-        $lastID = -1;
         $bindValues = array();
-        $queryStr = null;
+        $queryStr = "SELECT DISTINCT p.id FROM patient p ";
+        $pos = 0;
 
         // Construct the SQL search string using each parameter as a separate dataset merged using JOINs.
         foreach ($criteria as $id => $param) {
             // Ignore any case search parameters that do not implement DBProviderInterface
-            if ($criteria instanceof DBProviderInterface) {
-                if ($queryStr !== null) {
-                    $queryStr .= $param->join($criteria[$lastID]->alias(), array('id' => 'id'), $this);
-                } else {
-                    $from = $param->query($this);
-                    $alias = $param->alias();
-                    $queryStr = "SELECT $alias.id FROM ($from) $alias";
-                }
+            if ($param instanceof DBProviderInterface) {
+                // Get the query component of the parameter, append it in the correct manner and augment the list of binds.
+                $from = $param->query($this);
+                $queryStr .= ($pos === 0) ? "WHERE p.id IN ($from)" : " AND p.id IN ($from)";
                 $bindValues = array_merge($bindValues, $param->bindValues());
-                $lastID = $id;
+                $pos++;
             }
         }
 

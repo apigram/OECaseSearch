@@ -17,15 +17,18 @@ class DBProvider extends SearchProvider
 
         // Construct the SQL search string using each parameter as a separate dataset merged using JOINs.
         foreach ($criteria as $id => $param) {
-            if ($queryStr !== null) {
-                $queryStr .= $param->join($criteria[$lastID]->alias(), array('id' => 'id'), $this);
-            } else {
-                $from = $param->query($this);
-                $alias = $param->alias();
-                $queryStr = "SELECT $alias.id FROM ($from) $alias";
+            // Ignore any case search parameters that do not implement DBProviderInterface
+            if ($criteria instanceof DBProviderInterface) {
+                if ($queryStr !== null) {
+                    $queryStr .= $param->join($criteria[$lastID]->alias(), array('id' => 'id'), $this);
+                } else {
+                    $from = $param->query($this);
+                    $alias = $param->alias();
+                    $queryStr = "SELECT $alias.id FROM ($from) $alias";
+                }
+                $bindValues = array_merge($bindValues, $param->bindValues());
+                $lastID = $id;
             }
-            $bindValues = array_merge($bindValues, $param->bindValues());
-            $lastID = $id;
         }
 
         $command = Yii::app()->db->createCommand($queryStr)->bindValues($bindValues);

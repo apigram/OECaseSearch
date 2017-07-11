@@ -21,8 +21,9 @@ class DBProvider extends SearchProvider
             if ($param instanceof DBProviderInterface) {
                 // Get the query component of the parameter, append it in the correct manner and augment the list of binds.
                 $from = $param->query($this);
-                $queryStr .= ($pos++ === 0) ? "WHERE p.id IN ($from)" : " AND p.id IN ($from)";
+                $queryStr .= ($pos === 0) ? "WHERE p.id IN ($from)" : " AND p.id IN ($from)";
                 $bindValues = array_merge($bindValues, $param->bindValues());
+                $pos++;
             }
         }
 

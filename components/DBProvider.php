@@ -12,7 +12,7 @@ class DBProvider extends SearchProvider
     protected function executeSearch($criteria)
     {
         $bindValues = array();
-        $queryStr = "SELECT DISTINCT p.id FROM patient p ";
+        $queryStr = 'SELECT DISTINCT p.id FROM patient p ';
         $pos = 0;
 
         // Construct the SQL search string using each parameter as a separate dataset merged using JOINs.

@@ -8,6 +8,13 @@
 
 return array(
     'params' => array(
+        'menu_bar_items' => array(
+            'casesearch' => array(
+                'title' => 'Case Search',
+                'uri' => 'OECaseSearch/caseSearch',
+                'position' => 4,
+            ),
+        ),
         'CaseSearch' => array(
             'parameters' => array(
                 'core' => array(

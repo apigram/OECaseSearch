@@ -5,7 +5,7 @@
 /* @var $form CActiveForm */
 ?>
 
-<div id="<?php echo $id;?>" class="parameter box admin">
+<div id="<?php echo $id;?>" class="<?php echo $model->name; ?> parameter box admin">
   <div class="row field-row">
     <?php $model->renderParameter($id); ?>
     <?php echo CHtml::activeHiddenField($model, "[$id]id"); ?>

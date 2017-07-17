@@ -1,16 +1,14 @@
 <?php
 /* @var $this CaseSearchController
  * @var $fixedParams array
- * @var $params array
+ * @var $params array'
+ * @var $paramList array
  * @var $trial Trial
+ * @var $form CActiveForm
  */
-
-$this->breadcrumbs = array(
-    $this->module->id,
-);
 $this->pageTitle = 'OpenEyes - Case Search'
 ?>
-<h1 class="badge"><?php echo $this->trialContext == null ? 'Case Search' : 'Adding Patients to Trial: ' . $this->trialContext->name; ?></h1>
+<h1 class="badge"><?php echo $this->trialContext === null ? 'Case Search' : 'Adding Patients to Trial: ' . $this->trialContext->name; ?></h1>
 
 <div class="row">
   <div class="large-10 column">
@@ -102,7 +100,7 @@ $this->pageTitle = 'OpenEyes - Case Search'
           new OpenEyes.UI.Dialog.Alert({
             content: "Sorry, an internal error occurred and we were unable to remove the patient from the trial.\n\nPlease contact support for assistance."
           }).open();
-        },
+        }
       });
     }
   </script>
@@ -133,7 +131,7 @@ $('#clear-search').click(function() {
     Yii::app()->clientScript->registerScriptFile($this->module->getAssetsUrl() . '/js/QueryBuilder.js');
     Yii::app()->clientScript->registerCssFile($this->module->getAssetsUrl() . '/css/QueryBuilder.css');
 
-    $assetPath = Yii::app()->getAssetManager()->publish(Yii::getPathOfAlias('application.assets'), false, -1);
-    Yii::app()->getClientScript()->registerScriptFile($assetPath . '/js/toggle-section.js');
+    $assetPath = Yii::app()->assetManager->publish(Yii::getPathOfAlias('application.assets'), false, -1);
+    Yii::app()->clientScript->registerScriptFile($assetPath . '/js/toggle-section.js');
     ?>
 

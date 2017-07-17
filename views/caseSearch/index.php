@@ -1,7 +1,7 @@
 <?php
 /* @var $this CaseSearchController
  * @var $fixedParams array
- * @var $params array'
+ * @var $params array
  * @var $paramList array
  * @var $trial Trial
  * @var $form CActiveForm

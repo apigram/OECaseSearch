@@ -3,7 +3,6 @@
 class CaseSearchController extends BaseModuleController
 {
     public $layout = '//layouts/main';
-    public $trialContext;
 
     public function filters()
     {
@@ -27,9 +26,8 @@ class CaseSearchController extends BaseModuleController
 
     /**
      * Primary case search action.
-     * @param $trial_id integer The Trial that this case search is in context of
      */
-    public function actionIndex($trial_id = null)
+    public function actionIndex()
     {
         $valid = true;
         $parameters = array();
@@ -37,11 +35,6 @@ class CaseSearchController extends BaseModuleController
         $ids = array();
         if (isset($_SESSION['last_search'])) {
             $ids = $_SESSION['last_search'];
-        }
-
-        $this->trialContext = null;
-        if ($trial_id !== null) {
-            $this->trialContext = Trial::model()->findByPk($trial_id);
         }
 
         $criteria = new CDbCriteria();

@@ -3,12 +3,11 @@
  * @var $fixedParams array
  * @var $params array
  * @var $paramList array
- * @var $trial Trial
  * @var $form CActiveForm
  */
 $this->pageTitle = 'OpenEyes - Case Search'
 ?>
-<h1 class="badge"><?php echo $this->trialContext === null ? 'Case Search' : 'Adding Patients to Trial: ' . $this->trialContext->name; ?></h1>
+<h1 class="badge">Case Search</h1>
 
 <div class="row">
   <div class="large-10 column">
@@ -68,43 +67,6 @@ $this->pageTitle = 'OpenEyes - Case Search'
       </div>
     </div>
   </div>
-
-  <script type="text/javascript">
-    function addPatientToTrial(patient_id, trial_id) {
-      $.ajax({
-        url: '<?php echo Yii::app()->createUrl('/OETrial/trial/addPatient'); ?>',
-        data: {id: trial_id, patient_id: patient_id},
-        type: 'GET',
-        success: function (response) {
-          $('#add-to-trial-link-' + patient_id).hide();
-          $('#remove-from-trial-link-' + patient_id).show();
-        },
-        error: function (response) {
-          new OpenEyes.UI.Dialog.Alert({
-            content: "Sorry, an internal error occurred and we were unable to add the patient to te trial.\n\nPlease contact support for assistance."
-          }).open();
-        },
-      });
-    }
-
-    function removePatientFromTrial(patient_id, trial_id) {
-      $.ajax({
-        url: '<?php echo Yii::app()->createUrl('/OETrial/trial/removePatient'); ?>',
-        data: {id: trial_id, patient_id: patient_id},
-        type: 'GET',
-        success: function (response) {
-          $('#remove-from-trial-link-' + patient_id).hide();
-          $('#add-to-trial-link-' + patient_id).show();
-        },
-        error: function (response) {
-          new OpenEyes.UI.Dialog.Alert({
-            content: "Sorry, an internal error occurred and we were unable to remove the patient from the trial.\n\nPlease contact support for assistance."
-          }).open();
-        }
-      });
-    }
-  </script>
-
 
     <?php
     Yii::app()->clientScript->registerScript('addParam', "

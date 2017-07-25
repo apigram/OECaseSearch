@@ -57,11 +57,22 @@ $this->pageTitle = 'OpenEyes - Case Search'
       <div id="results">
           <?php if (isset($patients)) {
               $this->widget('zii.widgets.CListView', array(
-                  'dataProvider' => $patients,
-                  'itemView' => 'search_results',
-                  'emptyText' => '<div class="box generic">No patients found</div>',
-                  'summaryCssClass' => 'box generic',
-              ));
+                      'dataProvider' => $patients,
+                      'itemView' => 'search_results',
+                      'emptyText' => '<div class="box generic">No patients found</div>',
+                      'summaryCssClass' => 'box generic',
+                      'pager' => $this->widget('LinkPager', array(
+                          'pages' => $patients->getPagination(),
+                          'maxButtonCount' => 15,
+                          'cssFile' => false,
+                          'selectedPageCssClass' => 'current',
+                          'hiddenPageCssClass' => 'unavailable',
+                          'htmlOptions' => array(
+                              'class' => 'pagination',
+                          ),
+                      )),
+                  )
+              );
           }
           ?>
       </div>

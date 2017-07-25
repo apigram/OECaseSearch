@@ -26,6 +26,11 @@ return array(
                     'PatientName',
                     'PatientNumber'
                 ),
+                /*
+                'module' => array(
+                    'CaseSearchParameter'
+                ),
+                */
             ),
             'fixedParameters' => array(
                 'core' => array(

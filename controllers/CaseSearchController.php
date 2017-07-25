@@ -35,9 +35,6 @@ class CaseSearchController extends BaseModuleController
         $parameters = array();
         $fixedParameters = $this->module->getFixedParams();
         $ids = array();
-        if (isset($_SESSION['last_search'])) {
-            $ids = $_SESSION['last_search'];
-        }
 
         $this->trialContext = null;
         if ($trial_id !== null) {
@@ -85,11 +82,6 @@ class CaseSearchController extends BaseModuleController
             // deconstruct the results list into a single array of primary keys.
             foreach ($results as $result) {
                 $ids[] = $result['id'];
-            }
-
-            // Only copy to the $_SESSION array if it isn't already there - Shallow copy is done at the start if it is already set.
-            if (!isset($_SESSION['last_search']) || empty($_SESSION['last_search'])) {
-                $_SESSION['last_search'] = $ids;
             }
         }
 
